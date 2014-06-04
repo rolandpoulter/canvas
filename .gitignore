@@ -1,0 +1,4 @@
+node_modules/
+logs/*
+config/default.json
+.DS_Store

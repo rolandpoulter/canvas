@@ -1,0 +1,4 @@
+<div>
+  {{> login}}
+  {{> wall}}
+</div>
