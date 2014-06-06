@@ -5,12 +5,12 @@ module.exports = main(require('../config'));
 function main (config) {
 
 	var cluster = require('cluster');
-	
+
 	var domain = require('domain').create();
 
 	var app = require('./app.js').create(config, domain);
 
-	var server = config.ssl ? 
+	var server = config.ssl ?
 		require('https').createServer(config.ssl, app) :
 		require('http').createServer(app);
 

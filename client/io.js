@@ -1,11 +1,7 @@
-ws = new SockJS(window.location + '/ws');
+'use strict';
+/*global window, SockJS, WebSocketMultiplex*/
 
-ws.ch = new WebSocketMultiplex(ws);
+global.ws = new SockJS(window.location + '/ws');
+global.ws.ch = new WebSocketMultiplex(ws);
 
-require('./io/board');
-require('./io/config');
-require('./io/entity');
-require('./io/session');
-require('./io/user');
-require('./io/view');
-require('./io/wall');
+require('bulk-require')(__dirname, ['io/*.js']);

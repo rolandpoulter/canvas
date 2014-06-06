@@ -17,7 +17,7 @@ function createWebServer(config, domain) {
 	app.domain = domain;
 	app.config = config;
 	app.mongo = require('mongoose').connect(config.mongo);
-	app.model = require('./model');
+	app.model = bulk('model/*.js').model;
 	app.events = new (require('events').EventEmitter)();
 
 	app.use(require('response-time')());
