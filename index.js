@@ -1,9 +1,8 @@
-process.title = require('./package.json').name;
+'use strict';
+process.title = 'node' + require('./package.json').name;
 
 var forever = require('forever-monitor'),
     path = require('path');
-
-var config = require('./config');
 
 var child = new (forever.Monitor)(path.join('server', 'cluster.js'), {
   silent: false,
@@ -30,16 +29,13 @@ var child = new (forever.Monitor)(path.join('server', 'cluster.js'), {
 child.on('exit', function () {
   console.log(process.title + ': has exited after too many restarts.');
 });
-
-child.on('exit:code', function(code) {
+child.on('exit:code', function (code) {
   console.error(process.title + ': detected script exited with code ' + code + '.');
 });
-
-child.on('watch:restart', function(info) {
+child.on('watch:restart', function (info) {
   console.error(process.title + ': restarted because ' + info.file + ' changed.');
 });
-
-child.on('restart', function() {
+child.on('restart', function () {
   console.error(process.title + ': restarted script for ' + child.times + ' time.');
 });
 

@@ -1,4 +1,5 @@
-process.title = require('../package.json').name + 'Master';
+'use strict';
+process.title = 'node' + require('../package.json').name + 'Master';
 
 var cluster = require('cluster'),
     numCPUs = require('os').cpus().length;
@@ -17,24 +18,28 @@ if (cluster.isMaster) {
     cluster.fork();
   }
 
-  function timeoutErrorMsg () {
-    console.error(process.title + ': is unable to reach a child worker.');
-  }
-
   cluster.on('exit', function (worker, code, signal) {
-    console.log(process.title + ': child worker ' + worker.process.pid + ' died.');
+    console.log(
+      process.title + ': child worker ' + worker.process.pid + ' died.',
+      code, signal);
     clearTimeout(timeouts[worker.id]);
     cluster.fork();
   });
 
   cluster.on('fork', function (worker) {
     console.log(process.title + ': forked child ' + worker.process.pid + '.');
-  	timeouts[worker.id] = setTimeout(timeoutErrorMsg, 2000);
+    timeouts[worker.id] = setTimeout(timeoutErrorMsg, 2000);
     timeouts[worker.id].unref();
-	});
+  });
 
-	cluster.on('listening', function(worker, address) {
-    console.log(process.title + ': listening to child ' + worker.process.pid + '.');
-  	clearTimeout(timeouts[worker.id]);
-	});
+  cluster.on('listening', function (worker, address) {
+    console.log(
+      process.title + ': listening to child ' + worker.process.pid + '.',
+      address.address + ':' + address.port);
+    clearTimeout(timeouts[worker.id]);
+  });
+}
+
+function timeoutErrorMsg() {
+  console.error(process.title + ': is unable to reach a child worker.');
 }

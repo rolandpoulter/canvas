@@ -1,7 +1,7 @@
 'use strict';
-/*global window, SockJS, WebSocketMultiplex*/
+/*global window, app, SockJS, WebSocketMultiplex*/
 
-global.ws = new SockJS(window.location + '/ws');
-global.ws.ch = new WebSocketMultiplex(ws);
+app.ws = new SockJS(window.location.origin + '/ws');
+app.ws.ch = new WebSocketMultiplex(app.ws);
 
 require('bulk-require')(__dirname, ['io/*.js']);

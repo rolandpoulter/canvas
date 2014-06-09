@@ -2,8 +2,8 @@
 /*global jQuery, document, events*/
 var qs = require('querystring');
 
-var views = require('./ui/views'),
-    partials = require('./ui/partials');
+var layouts = global.app.ui.layouts,
+    partials = global.app.ui.partials;
 
 module.exports = function (route, block) {
 	if (block) block(route);
@@ -25,11 +25,12 @@ function router(context) {
 }
 
 function render(context) {
+	/*jshint maxcomplexity:5*/
 	if (last_context) clear(last_context);
 	if (context.route.before_render) {
 		context.route.before_render(context, last_context);
 	}
-	var view = context.route.view || views.main,
+	var view = context.route.view || layouts.main,
       html = view.render(context.scope, partials);
 	context.view = jQuery(html);
 	context.view.appendTo(document.body);
@@ -39,6 +40,7 @@ function render(context) {
 }
 
 function clear(context) {
+	/*jshint maxcomplexity:5*/
 	if (context.route.before_clear) {
 		context.route.before_render(context);
 	}

@@ -1,17 +1,16 @@
 'use strict';
-var page = require('page');
-
-var router = require('../router');
-
-var pages = {};
-
-require('./routes/wall');
+/*global app*/
+var router = require('./lib/router.js');
 
 function route(name) {
-	return router(require('./routes/' + name), function (route) {
+	return router(app.ui.views[name], function (route) {
 		route.name = name;
 	});
 }
+
+var page = require('page');
+
+var pages = module.exports = {};
 
 pages.wall = function (path) {
 	page(path, route('wall'));

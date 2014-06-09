@@ -1,9 +1,7 @@
 'use strict';
+process.title = 'node' + require('../package.json').name + 'WebServer';
 
-process.title = require('../package.json').name + 'WebServer';
-
-var // qs = require('querystring'),
-    bulk = require('bulk-require'),
+var bulk = require('bulk-require'),
     express = require('express');
 
 exports.create = createWebServer;
@@ -13,6 +11,7 @@ if (module.main === module) {
 }
 
 function createWebServer(config, domain) {
+	/*jshint maxstatements: 20*/
 	var app = express();
 	app.domain = domain;
 	app.config = config;
@@ -21,10 +20,6 @@ function createWebServer(config, domain) {
 	app.events = new (require('events').EventEmitter)();
 
 	app.use(require('response-time')());
-	// app.use(function (request, reponse, next) {
-		// request.query = request.query || qs.parse(require.url.split('?')[1]);
-		// next();
-	// });
 	app.use(require('body-parser')());
 	app.use(require('method-override')());
 	app.use(require('cookie-parser')());
@@ -33,9 +28,11 @@ function createWebServer(config, domain) {
 	app.use(require('compression')());
 	app.use(require('morgan')('dev'));
 
-	bulk(__dirname, ['middleware/**/*.js'], {require: function (middleware) {
+	var bulk_route_options = {require: function (middleware) {
 		require(middleware).create(app);
-	}});
+	}};
+	bulk(__dirname, ['middleware/*.js'], bulk_route_options);
+	bulk(__dirname, ['middleware/deffered/*.js'], bulk_route_options);
 
 	app.setupServer = function (web_server) {
 		app.events.emit('setup_server', web_server);

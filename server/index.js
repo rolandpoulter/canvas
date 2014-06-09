@@ -1,19 +1,15 @@
-process.title = require('../package.json').name + 'Worker';
+'use strict';
+process.title = 'node' + require('../package.json').name + 'Worker';
 
-module.exports = main(require('../config'));
-
-function main (config) {
-
+module.exports = createServer(require('../config'));
+function createServer(config) {
 	var cluster = require('cluster');
-
 	var domain = require('domain').create();
-
 	var app = require('./app.js').create(config, domain);
 
 	var server = config.ssl ?
 		require('https').createServer(config.ssl, app) :
 		require('http').createServer(app);
-
 	if (app.setupServer) {
 		app.setupServer(server);
 	}
@@ -22,7 +18,6 @@ function main (config) {
 		console.error(error.stack || error);
 		reset();
 	});
-
 	domain.run(function () {
 		var server_config = config.webserver;
 		console.log(process.pid, 'Listening on ' + server_config.host + ':' + server_config.port);
@@ -31,7 +26,7 @@ function main (config) {
 
 	return reset;
 
-	function reset () {
+	function reset() {
 		try {
 			setTimeout(process.exit.bind(process, 1), 30000).unref();
 			if (server) server.close();
@@ -44,5 +39,4 @@ function main (config) {
 			process.exit(1);
 		}
 	}
-
 }
