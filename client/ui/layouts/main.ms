@@ -1,4 +1,5 @@
-<div>
-  {{> login}}
+<div class="page">
+  {{> account}}
   {{> wall}}
+  <div class="test"></div>
 </div>

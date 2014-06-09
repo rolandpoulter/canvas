@@ -8,5 +8,5 @@ exports.Main = React.createClass({
 
 exports.render = function (parent) {
   var Main = exports.Main;
-  React.renderComponent(<Main />, parent || document.body);
+  React.renderComponent(<Main />, parent);
 };

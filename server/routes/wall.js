@@ -2,5 +2,6 @@
 var sendIndex = require('./lib/sendIndex.js');
 
 exports.create = function (app) {
-	app.get('/', sendIndex);
+  app.get('/:owner',       sendIndex);
+  app.get('/:owner/:wall', sendIndex);
 };
