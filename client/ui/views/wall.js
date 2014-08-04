@@ -1,7 +1,7 @@
 'use strict';
 /*global app*/
 var WallModel = require('../../model/Wall.js'),
-    ViewModel = require('../../model/View.js');
+    ViewModel = require('../../model/entity/View.js');
 /*jshint unused:false*/
 exports.before_filter = function (context, last_context) {
 	console.log('before_filter');
@@ -15,7 +15,7 @@ exports.before_render = function (context, last_context) {
 	});
 	context.currentView = new ViewModel({
 		id: -1,
-		scale: 1,
+		scale: 10,
 		offset: [0, 0]
 	});
 	context.wallModel.setCurrentView(context.currentView);
@@ -74,7 +74,9 @@ exports.before_render = function (context, last_context) {
 
 exports.after_render = function (context, last_context) {
 	// app.ui.components.wall.render(app.$('div.page div.test').get(0));
-	context.wallModel.render(app.$('div.page div.test').get(0));
+	var testElem = app.$('div.page div.test').get(0);
+  // debugger;
+	context.wallModel.render(testElem);
 	console.log('after_render');
 };
 

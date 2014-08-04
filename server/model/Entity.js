@@ -7,10 +7,6 @@ var entitySchema = new (mongoose.Schema)({
     type: Types.ObjectId,
     index: true
   },
-  board: {
-    type: Types.ObjectId,
-    index: true
-  },
   body: Types.Mixed,
   meta: {},
   date: {

@@ -13,6 +13,16 @@ exports.create = function (app) {
 	});
 	app.ws.ch = new ws_multiplex.MultiplexServer(app.ws);
 
+  app.ws.on('connection', function (app_stream) {
+		console.log('client websocket connection made.');
+		app_stream.on('data', function (data) {
+			console.log('received io message:', data);
+		});
+		app_stream.on('close', function () {
+			console.log('client websocket connection closed.');
+		});
+	});
+
 	io_messagers.forEach(function (messager) {
 		require(messager).io(app.ws, app.model, app.config);
 	});

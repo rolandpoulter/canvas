@@ -1,7 +1,15 @@
-exports.io = function (ws, model, config) {
-	var session = ws.ch.registerChannel('session');
+'use strict';
+var sessionStore = require('../lib/sessionStore.js');
 
-	session.on('connection', function (session) {
-		session.on('data', function (data) {});
+exports.io = function (ws) {
+	var session_channel = ws.ch.registerChannel('session');
+
+	session_channel.on('connection', function (session_stream) {
+		session_stream.on('data', function (session_id) {
+			sessionStore.get(session_id, function (err, session) {
+				if (err) console.error(err);
+				session_stream.write(JSON.stringify(session || {}));
+			}, true);
+		});
 	});
 };

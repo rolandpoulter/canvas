@@ -8,7 +8,7 @@ var config = require('../config');
 
 if (cluster.isMaster) {
 	cluster.setupMaster({
-		exec: __dirname + require('path').sep + 'index.js'
+		exec: __dirname + require('path').sep + 'worker.js'
 	});
 
   var threads = Math.min(numCPUs, config.webserver.cluster || 3),

@@ -2,11 +2,11 @@
 /*jshint ignore:start*/
 exports.View = React.createClass({
   render: function () {
-    return <div>Hello World!</div>;
+    return <div>View</div>;
   }
 });
 
 exports.render = function (parent) {
   var View = exports.View;
-  React.renderComponent(<View />, parent);
+  return React.renderComponent(<View />, parent);
 };

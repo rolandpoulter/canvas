@@ -1,7 +1,7 @@
 'use strict';
-var BoundingBox = require('../lib/BoundingBox.js');
+var BoundingBox = require('../../lib/BoundingBox.js');
 
-var viewComponent = require('../ui/components/view.jsx');
+var viewComponent = require('../../ui/components/view.jsx');
 
 module.exports = View;
 
@@ -33,20 +33,20 @@ View.prototype.setStruct = function () {
 };
 
 View.prototype.render = function (parent) {
-  this.element = viewComponent.render(parent || global.document.body, this);
+  console.log('render view', this);
+  this.component = viewComponent.render(parent || global.document.body, this);
+  this.element = this.component.getDOMNode();
 };
 
 View.prototype.setCurrentWall = function (wall) {
+  /*jshint maxcomplexity:8*/
   if (this.currentWall) {
     if (this.currentWall === wall) return;
     this.currentWall.setCurrentView(null);
   }
   if (wall) {
-    if (wall.currentView !== this) {
-      wall.setCurrentView(this);
-    }
     this.currentWall = wall;
-    this.render();
+    if (wall.currentView !== this) wall.setCurrentView(this);
   }
 };
 
@@ -57,5 +57,5 @@ View.prototype.updateBox = function (dontUpdateIndex) {
 };
 
 View.prototype.intersects = function (model) {
-  return this.boundingBox.intersects(model.box);
+  return this.boundingBox.intersects(this.box, model.box);
 };

@@ -2,6 +2,6 @@
 
 module.exports = Session;
 
-function Session(model) {
-  this.attr = model.attr;
+function Session(params) {
+  this.attr = params.attr;
 }

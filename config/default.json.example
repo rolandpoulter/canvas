@@ -1,5 +1,12 @@
 {
 	"mongo": "mongodb://127.0.0.1/wall-io",
+	"redis": {
+		"host": "127.0.0.1",
+		"port": "6379"
+	},
+	"webclient": {
+		"session_key": "wall.id"
+	},
 	"webserver": {
 		"cluster": 3,
 		"host": "127.0.0.1",

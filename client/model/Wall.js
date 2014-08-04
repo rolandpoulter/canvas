@@ -39,30 +39,32 @@ Wall.prototype.setStruct = function (params) {
 };
 
 Wall.prototype.render = function (parent) {
-  this.element = wallComponent.render(parent || global.document.body, this);
+  console.log('render wall', this);
+  this.component = wallComponent.render(parent || global.document.body, this);
+  this.element = this.component.getDOMNode();
   this.renderCurrentView();
 };
 
 Wall.prototype.renderCurrentView = function () {
   if (!this.currentView) return;
-  this.index.search(this.currentView).forEach(function (item) {
-    item.render(this.element)
+  this.index.search(this.currentView.box).forEach(function (item) {
+    item.model.render(this.element);
   }.bind(this));
 };
 
 Wall.prototype.setCurrentView = function (view) {
+  /*jshint maxcomplexity:8*/
   if (this.currentView) {
     if (this.currentView === view) return;
     this.currentView.setCurrentWall(null);
   }
   if (view) {
-    if (view.currentWall === this)
-    view.setCurrentWall(this);
     this.currentView = view;
+    if (view.currentWall !== this) view.setCurrentWall(this);
   }
 };
 
-Wall.prototype.updateIndexedBox = function (entry) {
+Wall.prototype.updateIndexedBox = function () {
   this.index.remove(this.box);
   this.index.insert(this.box);
 };
