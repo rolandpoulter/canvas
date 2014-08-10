@@ -1,4 +1,11 @@
 'use strict';
 var bulk = require('bulk-require');
 
-bulk('./tasks/*/*.js');
+var tasks = bulk(__dirname, './tasks/*.js', {
+  require: function (task) {
+    console.log(task);
+    require(task);
+  }
+});
+
+console.log(tasks);

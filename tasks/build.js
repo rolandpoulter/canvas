@@ -1,4 +1,4 @@
 'use strict';
 var gulp = require('gulp');
 
-gulp.task('build', ['browserify_bundle']);
+gulp.task('build', ['webpack_client']);
