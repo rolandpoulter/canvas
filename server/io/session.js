@@ -1,5 +1,5 @@
 'use strict';
-var sessionStore = require('../lib/sessionStore.js');
+var sessionStore = require('../lib/session_store.js');
 
 exports.io = function (ws) {
 	var session_channel = ws.ch.registerChannel('session');

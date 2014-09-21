@@ -1,16 +1,16 @@
 'use strict';
-var path = require('path'),
-    glob = require('glob'),
-    sockjs = require('sockjs'),
+
+var sockjs = require('sockjs'),
     ws_multiplex = require('websocket-multiplex');
 
-var io_messagers = glob.sync(path.join(__dirname, '..', 'io', '**', '*.js'));
+exports.load = function (app) {
+  app = app || global.app;
 
-exports.create = function (app) {
 	app.ws = sockjs.createServer({
 		sockjs_url: app.config.sockjs_url ||
 			'http://cdn.sockjs.org/sockjs-0.3.min.js'
 	});
+
 	app.ws.ch = new ws_multiplex.MultiplexServer(app.ws);
 
   app.ws.on('connection', function (app_stream) {
@@ -23,7 +23,7 @@ exports.create = function (app) {
 		});
 	});
 
-	io_messagers.forEach(function (messager) {
+	app.io.messengers.forEach(function (messager) {
 		require(messager).io(app.ws, app.model, app.config);
 	});
 

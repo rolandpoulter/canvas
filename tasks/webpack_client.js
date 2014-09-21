@@ -6,8 +6,9 @@ exports.create = createWebpackClient;
 
 global.config = global.config || require('../config');
 
-var webpack = require('webpack'),
-    log = console.log;
+var log = console.log,
+    path = require('path'),
+    webpack = require('webpack');
 
 if (!module.parent) {
   webpack = require('gulp-webpack');
@@ -52,8 +53,11 @@ function createWebpackClient(config, options, build) {
 
   var webpack_config = {
     name: 'client',
-    // entry: './entry.js',
+    entry: [
+      path.join(__dirname, '..', 'client', 'index.js')
+    ],
     output: {
+      path: path.join(__dirname, '..', 'static', 'js'),
       filename: 'client.js'
     },
     module: {

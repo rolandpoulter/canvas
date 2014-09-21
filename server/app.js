@@ -1,44 +1,31 @@
 'use strict';
 
-app.use(function* (next) {
-  this.body = 'Hello World';
-  yield next;
-});
+app.io = app.io || {messengers: []};
 
-// app.mongo = require('mongoose').connect(config.mongo);
-// app.redis = require('redis').createClient(
-//   config.redis.port,
-//   config.redis.host
-// );
+require('./io/entity.js');
+require('./io/session.js');
+require('./io/user.js');
+require('./io/wall.js');
+
+// require('./middleware/bundle.js').load();
+// require('./middleware/styles.js').load();
+
+require('./middleware/websockets.js').load();
+// require('./middleware/session.js').load();
+// require('./middleware/routes.js').load();
+
+// app.schema = app.schema || {};
 //
-// app.model = bulk('model/*.js').model;
-// app.events = new (require('events').EventEmitter)();
+// require('./schema/entity.js');
+// require('./schema/session.js');
+// require('./schema/user.js');
+// require('./schema/view.js');
+// require('./schema/wall.js');
 //
-// global.app = app;
+// app.model = app.model || {};
 //
-// app.use(require('compression')());
-// app.use(require('errorhandler')());
-// app.use(require('morgan')('dev'));
-//
-// app.use(require('response-time')());
-// app.use(require('body-parser')());
-// app.use(require('method-override')());
-//
-// app.use(require('cookie-parser')());
-// app.use(require('express-session')({
-//   key:  config.webclient.session_key,
-//   name: config.webclient.session_key,
-//   proxy: false,
-//   store: require('./lib/sessionStore'),
-//   secret: 'lalafoofoo secret meemeeseecoo',
-//   cookie: {path: '/', httpOnly: false, secure: false, maxAge: null},
-//   rolling: true,
-//   resave: true,
-//   saveUninitialized: true
-// }));
-//
-// var bulk_route_options = {require: function (middleware) {
-//   require(middleware).create(app);
-// }};
-// bulk(__dirname, ['middleware/*.js'], bulk_route_options);
-// bulk(__dirname, ['middleware/deffered/*.js'], bulk_route_options);
+// require('./model/Entity.js');
+// require('./model/Session.js');
+// require('./model/User.js');
+// require('./model/View.js');
+// require('./model/Wall.js');

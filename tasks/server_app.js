@@ -6,8 +6,9 @@ exports.load = loadApp;
 
 global.config = global.config || require('../config');
 
-var koala = require('koala'),
-    logger = console;
+var path = require('path'),
+    koala = require('koala'),
+    logger = console;//require('../lib/logger.js');
 
 if (!module.parent) main();
 
@@ -33,7 +34,8 @@ function runApp(config) {
   config = config || global.config;
 
   return loadApp(config)
-    .createServer(config.app_entry || __dirname + '/../server/app.js')
+    .createServer(config.app_entry ||
+                  path.join(__dirname, '..', 'server', 'app.js'))
     .setupServer()
     .listen();
 }
@@ -43,7 +45,13 @@ function loadApp(config, domain) {
 
   config = config || global.config;
 
-  var app = global.app || koala({});
+  var app = global.app || koala({
+    fileServer: {
+      root: config.static_root ||
+            path.join(__dirname, '..', 'static'),
+      maxage: config.static_max_age || '1 year'
+    }
+  });
 
   app.config = config || {};
   app.domain = domain || null;
@@ -56,7 +64,10 @@ function loadApp(config, domain) {
 
   app.createServer = function (_app_entry_path) {
     var appRequire;
-    if (_app_entry_path) {
+    if (!config.hotCode) {
+      require(_app_entry_path);
+    }
+    else if (_app_entry_path) {
       appRequire = require('enhanced-require')(module, {
         recursive: true,
         watch: true,
@@ -82,8 +93,10 @@ function loadApp(config, domain) {
     web_server = web_server || app.server;
     server_config = server_config || app.config.server;
     logger.log('#' + process.pid + ' - ' +
-      server_config.host + ':' + server_config.port);
-    web_server.listen(server_config.port, server_config.host || '0.0.0.0');
+               server_config.host + ':' +
+               server_config.port);
+    web_server.listen(server_config.port,
+                      server_config.host || '0.0.0.0');
     app.events.emit('server_listen', web_server);
     return app;
   };
