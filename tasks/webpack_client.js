@@ -70,7 +70,8 @@ function createWebpackClient(config, options, build) {
         {test: /\.txt$/,    loader: 'raw-loader'},
         {test: /\.html$/,   loader: 'html-loader'},
         {test: /\.md$/,     loader: 'html-loader!markdown-loader'},
-        {test: /\.ms$/,     loader: 'mustache-loader'},
+        // {test: /\.ms$/,     loader: 'mustache-loader'},
+        {test: /\.ms$/,     loader: 'file-loader'},
         {test: /\.png$/,    loader: 'url-loader'},
         {test: /\.obj$/,    loader: 'file-loader'},
         {test: /\.css$/,    loader: 'style-loader!css-loader'}

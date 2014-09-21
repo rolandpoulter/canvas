@@ -47,6 +47,7 @@ function loadApp(config, domain) {
   config = config || global.config;
 
   var app = global.app || !config.koa ? koala({
+    session: false,
     fileServer: {
       root: config.static_root ||
             path.join(__dirname, '..', 'static'),

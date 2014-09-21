@@ -11,7 +11,7 @@ app.use(staticServer(
   config.static_root || path.join(__dirname, '..', '..', 'static'),
   {
     index: 'index.html',
-    // defer: true,
+    defer: true,
     hidden: true,
     maxage: config.static_max_age || 0
   }

@@ -3,12 +3,13 @@
 
 app.io = exports;
 
+app.ws =
 exports.ws = new SockJS(window.location.origin + '/ws', null, {
   debug: true,
   devel: true
 });
 
-exports.ws.ch = new WebSocketMultiplex(app.ws);
+exports.ws.ch = new WebSocketMultiplex(exports.ws);
 
 exports.ws.onopen = function () {
   console.log('ws connection opened.');

@@ -22,7 +22,9 @@
 // exports.webserver.port = nconf.get('webserver:port');
 // exports.webserver.host = nconf.get('webserver:host');
 
-exports.client = {};
+exports.client = {
+  session_key: 'wall.id'
+};
 
 exports.server = {
   host: 'localhost',

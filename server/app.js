@@ -22,12 +22,12 @@ require('./model/Wall.js');
 
 // Middleware
 require('./middleware/bundle.js');
-// require('./middleware/styles.js');
+require('./middleware/styles.js');
+require('./middleware/static.js');
 require('./middleware/websockets.js');
 require('./middleware/session.js');
 require('./middleware/passport.js');
 require('./middleware/router.js');
-// require('./middleware/static.js');
 
 // Routes
 require('./routes/authentication.js');

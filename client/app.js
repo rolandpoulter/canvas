@@ -1,5 +1,7 @@
 'use strict';
 
+global.onerror = null;
+
 global.app = exports;
 
 app.$ = global.jQuery;

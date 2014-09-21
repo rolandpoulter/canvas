@@ -3,6 +3,7 @@
 
 module.exports = sendIndex;
 
-function* sendIndex(next) {
+function* sendIndex() {
+  console.log(this.session);
   yield* this.fileServer.send('index.html');
 }

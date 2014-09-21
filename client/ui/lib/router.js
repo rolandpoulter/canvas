@@ -5,6 +5,8 @@ var qs = require('querystring');
 var layouts = global.app.ui.layouts,
     partials = global.app.ui.partials;
 
+console.log(partials);
+
 module.exports = function (route, block) {
 	if (block) block(route);
 	return router.bind(route);
@@ -30,8 +32,8 @@ function render(context) {
 	if (context.route.before_render) {
 		context.route.before_render(context, last_context);
 	}
-	var view = context.route.view || layouts.main,
-      html = view.render(context.scope, partials);
+  var view = context.route.view || layouts.main;
+  var html = view.render(context.scope, partials);
 	context.view = jQuery(html);
 	context.view.appendTo(document.body);
 	if (context.route.after_render) {

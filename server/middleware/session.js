@@ -3,5 +3,10 @@
 var session = require('koa-generic-session');
 
 app.use(session({
-  redisStore: require('../lib/session_store.js')
+  key: 'wall.id',
+  cookie: {
+    httpOnly: false,
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  },
+  store: require('../lib/session_store.js')
 }));
