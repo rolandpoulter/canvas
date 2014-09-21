@@ -1,11 +1,14 @@
 'use strict';
 
-var session = require('koa-generic-session'),
-    redisStore = require('koa-redis');
+var session = require('koa-generic-session');
 
-var sessionStore = redisStore({
-  prefix: 'sess:',
-  client: app.redis
-});
+exports.load = function (app) {
+  app = app || global.app;
 
-module.exports = sessionStore;
+  if (app.session) return;
+  app.session = true;
+
+  app.use(session({
+    redisStore: require('../lib/session_store.js')
+  }));
+};

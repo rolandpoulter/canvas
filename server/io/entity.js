@@ -1,3 +1,5 @@
+'use strict';
+
 exports.io = function (ws, model, config) {
 	var entity = ws.ch.registerChannel('entity');
 

@@ -7,7 +7,6 @@ exports.load = function (app) {
   app = app || global.app;
 
   if (app.bundle) return;
-
   app.bundle = true;
 
   var webpack_config = require('../../tasks/webpack_client.js').create(null, {

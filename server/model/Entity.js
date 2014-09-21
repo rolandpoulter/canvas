@@ -1,27 +1,15 @@
-var mongoose = require('mongoose'),
-    Types = mongoose.Schema.Types;
+'use strict';
 
-var entitySchema = new (mongoose.Schema)({
-  name: String,
-  user: {
-    type: Types.ObjectId,
-    index: true
-  },
-  body: Types.Mixed,
-  meta: {},
-  date: {
-  	type: Date,
-  	default: Date.now
-  },
-  mdate: {
-    type: Date,
-    default: Date.now
-  },
-  layer: Number,
-  hidden: Boolean,
-  comments: [
-  	{body: String, date: Date}
-  ]
-});
+var Schema = require('jugglingdb').Schema;
 
-module.exports = mongoose.model('Entity', entitySchema);
+module.exports = app.db.mongo.schema.define('Entity', {
+  name: {type: String, length: 255},
+  // user: {type: Schema.ObjectId, index: true},
+  body: {type: String},
+  meta: {type: Schema.JSON},
+  date: {type: Date, default: Date.now},
+  mdate: {type: Date, default: Date.now},
+  layer: {type: Number},
+  hidden: {type: Boolean},
+  comments: [{body: String, date: Date}]
+}, {});

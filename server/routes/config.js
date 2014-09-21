@@ -1,6 +1,7 @@
 'use strict';
-exports.create = function (app) {
-  app.get('/config', function (req, res) {
-    res.json(app.config.webclient);
-  });
-};
+/*jshint noyield:true*/
+
+app.router.get('/config', function* () {
+  this.body = config.client;
+  yield null;
+});

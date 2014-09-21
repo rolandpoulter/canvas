@@ -24,7 +24,7 @@ exports.load = function (app) {
 	});
 
 	app.io.messengers.forEach(function (messager) {
-		require(messager).io(app.ws, app.model, app.config);
+		messager.io(app.ws, app.model, app.config);
 	});
 
 	app.events.on('setup_server', function (web_server) {

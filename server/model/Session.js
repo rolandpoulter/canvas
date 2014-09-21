@@ -1,8 +1,7 @@
-var mongoose = require('mongoose'),
-    Types = mongoose.Schema.Types;
+'use strict';
 
-var sessionSchema = new (mongoose.Schema)({
+// var Schema = require('jugglingdb').Schema;
 
+module.exports = app.db.redis.schema.define('Session', {
+  // TODO: should work with session_store
 });
-
-module.exports = mongoose.model('Session', sessionSchema);

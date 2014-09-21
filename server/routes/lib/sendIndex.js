@@ -1,10 +1,11 @@
+/*jshint ignore:start*/
 'use strict';
+
 var path = require('path');
 
 module.exports = sendIndex;
 
-function sendIndex(request, response) {
-  response.sendfile(
-    path.join(__dirname, '..', '..', '..', 'client', 'static', 'index.html')
-  );
+function* sendIndex() {
+  yield* this.fileServer.push(path.join(__dirname, '..', '..', '..',
+                                        'client', 'static', 'index.html'));
 }

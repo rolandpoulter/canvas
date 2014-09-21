@@ -1,3 +1,5 @@
+'use strict';
+
 exports.io = function (ws, model, config) {
 	var user = ws.ch.registerChannel('user');
 
