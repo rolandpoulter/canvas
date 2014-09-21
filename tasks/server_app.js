@@ -7,6 +7,7 @@ exports.load = loadApp;
 global.config = global.config || require('../config');
 
 var path = require('path'),
+    koa = require('koa'),
     koala = require('koala'),
     logger = console;//require('../lib/logger.js');
 
@@ -45,15 +46,15 @@ function loadApp(config, domain) {
 
   config = config || global.config;
 
-  var app = global.app || koala({
+  var app = global.app || !config.koa ? koala({
     fileServer: {
       root: config.static_root ||
             path.join(__dirname, '..', 'static'),
       index: true,
       hidden: true,
-      maxage: config.static_max_age || '1 year'
+      maxage: config.static_max_age || 0//'1 year'
     }
-  });
+  }) : koa(); // TODO:
 
   app.config = config || {};
   app.domain = domain || null;
@@ -67,7 +68,7 @@ function loadApp(config, domain) {
   app.createServer = function (_app_entry_path) {
     var appRequire;
     if (_app_entry_path) {
-      if (!!config.hotCode) {
+      if (!!config.hotCode) {// TODO:
         require(_app_entry_path);
       }
       else {

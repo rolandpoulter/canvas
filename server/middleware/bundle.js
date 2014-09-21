@@ -1,19 +1,12 @@
 'use strict';
 
 var webpack = require('webpack'),
-    webpackMiddleware = require('webpack-dev-middleware');
+    webpackMiddleware = require('../lib/koaWebpackMiddleware.js');
 
-exports.load = function (app) {
-  app = app || global.app;
+var webpack_config = require('../../tasks/webpack_client.js').create(null, {
+  returnConfig: true
+});
 
-  if (app.bundle) return;
-  app.bundle = true;
+var compiler = webpack(webpack_config);
 
-  var webpack_config = require('../../tasks/webpack_client.js').create(null, {
-    returnConfig: true
-  });
-
-  var compiler = webpack(webpack_config);
-
-  app.use(webpackMiddleware(compiler, {}));
-};
+app.use(webpackMiddleware(compiler, {quiet: true}));

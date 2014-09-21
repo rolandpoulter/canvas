@@ -1,21 +1,11 @@
 'use strict';
 
-exports.io = function (ws, model, config) {
-	var wall = ws.ch.registerChannel('wall');
+var wall_channel = app.ws.ch.registerChannel('wall');
 
-	// session.on('c_walls', function (q) {
-	// 	model.Wall.create(q);
-	// });
+module.exports = wall_channel;
 
-	// session.on('r_walls', function (q) {
-	// 	model.Wall.find(q);
-	// });
-
-	// session.on('u_walls', function (q) {
-	// 	model.Wall.update(q);
-	// });
-
-	// session.on('d_walls', function (q) {
-	// 	model.Wall.destroy(q);
-	// });
-};
+wall_channel.on('connection', function (wall_stream) {
+	wall_stream.on('data', function (data) {
+		console.log('wall', data);
+	});
+});

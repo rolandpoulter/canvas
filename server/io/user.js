@@ -1,9 +1,11 @@
 'use strict';
 
-exports.io = function (ws, model, config) {
-	var user = ws.ch.registerChannel('user');
+var user_channel = app.ws.ch.registerChannel('user');
 
-	user.on('connection', function (user) {
-		user.on('data', function (data) {});
+module.exports = user_channel;
+
+user_channel.on('connection', function (user_stream) {
+	user_stream.on('data', function (data) {
+		console.log('user', data);
 	});
-};
+});
