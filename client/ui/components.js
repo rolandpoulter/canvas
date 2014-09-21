@@ -1,2 +1,6 @@
-module.exports =
-  require('bulk-require')(__dirname, ['components/*.jsx']).components;
+'use strict';
+
+app.ui.components = exports;
+
+exports.view = require('./components/view.jsx');
+exports.wall = require('./components/wall.jsx');

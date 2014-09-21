@@ -1,2 +1,5 @@
-module.exports =
-  require('bulk-require')(__dirname, ['views/*.js']).views;
+'use strict';
+
+app.ui.views = exports;
+
+exports.wall = require('./views/wall.js');

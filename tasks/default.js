@@ -1,4 +1,3 @@
 'use strict';
-var gulp = require('gulp');
 
-gulp.task('default', ['server']);
+require('gulp').task('default', ['build', 'server_cluster']);

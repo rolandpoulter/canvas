@@ -1,7 +1,7 @@
 'use strict';
 /*global app*/
 var WallModel = require('../../model/Wall.js'),
-    ViewModel = require('../../model/entity/View.js');
+    ViewModel = require('../../model/Entity/View.js');
 /*jshint unused:false*/
 exports.before_filter = function (context, last_context) {
 	console.log('before_filter');

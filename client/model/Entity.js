@@ -2,6 +2,8 @@
 /*global app*/
 module.exports = Entity;
 
+Entity.View = require('./Entity/View.js');
+
 function Entity(params) {
   this.setParams(params);
   this.setStruct(params);

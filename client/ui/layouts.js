@@ -1,2 +1,5 @@
-module.exports =
-  require('bulk-require')(__dirname, ['layouts/*.ms']).layouts;
+'use strict';
+
+app.ui.layouts = exports;
+
+exports.main = require('./layouts/main.ms');

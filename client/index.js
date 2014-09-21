@@ -1,4 +1,5 @@
 'use strict';
+
 /*jshint ignore:start*/
 var global = window;
 /*jshint ignore:end*/
