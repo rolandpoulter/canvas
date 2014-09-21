@@ -3,5 +3,5 @@
 
 app.router.get('/config', function* () {
   this.body = config.client;
-  yield null;
+  yield this.body;
 });

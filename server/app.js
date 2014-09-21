@@ -1,5 +1,7 @@
 'use strict';
 
+// app.debug();
+
 app.name = 'wall-io-canvas';
 app.keys = ['key1', 'key2'];
 

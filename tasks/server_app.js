@@ -49,6 +49,8 @@ function loadApp(config, domain) {
     fileServer: {
       root: config.static_root ||
             path.join(__dirname, '..', 'static'),
+      index: true,
+      hidden: true,
       maxage: config.static_max_age || '1 year'
     }
   });
@@ -64,16 +66,21 @@ function loadApp(config, domain) {
 
   app.createServer = function (_app_entry_path) {
     var appRequire;
-    if (!config.hotCode) {
-      require(_app_entry_path);
-    }
-    else if (_app_entry_path) {
-      appRequire = require('enhanced-require')(module, {
-        recursive: true,
-        watch: true,
-        hot: true
-      });
-      appRequire(_app_entry_path);
+    if (_app_entry_path) {
+      if (!!config.hotCode) {
+        require(_app_entry_path);
+      }
+      else {
+        appRequire = require('enhanced-require')(module, {
+          substitutions: {
+            'jugglingdb-mongodb': require('jugglingdb-mongodb') // Hack
+          },
+          recursive: true,
+          watch: true,
+          hot: true
+        });
+        appRequire(_app_entry_path);
+      }
     }
     app.events.emit('before_server_created');
     app.server = config.ssl ?
