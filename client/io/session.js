@@ -11,10 +11,10 @@ app.onceSessionReady = function (callback) {
   sessionCallbacks.push(callback);
 };
 
-session_stream.onopen = function () {
+session_stream.onopen = function () {//debugger;
   var session_id = getCookieProperty(app.config.session_key);
-  session_id = session_id.substr(2);
-  session_id = session_id.split('.')[0];
+  // session_id = session_id.substr(2);
+  // session_id = session_id.split('.')[0];
   session_stream.send(session_id);
 };
 

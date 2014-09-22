@@ -22,7 +22,15 @@ function router(context) {
 	if (this.before_filter && this.before_filter(context, last_context)) {
 		return;
 	}
-	render(context);
+  if (app.session) {
+    context.scope.session = app.session;
+    render(context);
+  } else {
+    app.onceSessionReady(function (session) {
+      context.scope.session = session;
+      render(context);
+    });
+  }
 	last_context = context;
 }
 
@@ -33,6 +41,7 @@ function render(context) {
 		context.route.before_render(context, last_context);
 	}
   var view = context.route.view || layouts.main;
+  debugger;
   var html = view.render(context.scope, partials);
 	context.view = jQuery(html);
 	context.view.appendTo(document.body);
@@ -43,7 +52,7 @@ function render(context) {
 }
 
 function clear(context) {
-	/*jshint maxcomplexity:5*/
+	/*jshint maxcomplexity:6*/
 	if (context.route.before_clear) {
 		context.route.before_render(context);
 	}
@@ -52,7 +61,7 @@ function clear(context) {
 		jQuery(document.body).empty();
 		events.emit('clear_page', context);
 	}
-	else {
+	else if (context.view) {
 		context.view.remove().empty();
 		events.emit('clear_view', context);
 	}

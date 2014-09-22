@@ -3,3 +3,4 @@ logs/*
 config/default.json
 .DS_Store
 *.gz
+*.rdb

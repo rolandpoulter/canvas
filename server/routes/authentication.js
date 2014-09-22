@@ -2,7 +2,9 @@
 
 var passport = require('koa-passport');
 
-app.router.post('/login', passport.authenticate('local', {
+app.router.post('/login', /*function* () {
+	this.session.passport = this.session.passport || {};
+},*/ passport.authenticate('local', {
 	successRedirect: '/',
 	failureRedirect: '/'
 }));
