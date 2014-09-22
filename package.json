@@ -46,6 +46,7 @@
     "markdown-loader": "^0.1.2",
     "memory-fs": "^0.1.0",
     "mime": "^1.2.11",
+    "mustache-loader": "git://github.com/rolandpoulter/mustache-loader.git",
     "page": "^1.3.7",
     "passport": "^0.2.1",
     "rbush": "^1.3.4",
