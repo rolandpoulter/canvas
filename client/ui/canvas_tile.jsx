@@ -1,12 +1,9 @@
-'use strict';
-/*jshint ignore:start*/
-exports.CanvasTile = React.createClass({
+'use strict';/*global React*/
+
+var CanvasTile = React.createClass({
   render: function () {
     return <div>CanvasTile</div>;
   }
 });
 
-exports.render = function (parent) {
-  var CanvasTile = exports.CanvasTile;
-  return React.renderComponent(<CanvasTile />, parent);
-};
+module.exports = CanvasTile;

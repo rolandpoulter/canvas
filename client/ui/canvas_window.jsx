@@ -1,12 +1,20 @@
-'use strict';
-/*jshint ignore:start*/
-exports.CanvasWindow = React.createClass({
+'use strict';/*global React*/
+
+var CanvasTile = require('./canvas_tile.jsx');
+
+var CanvasWindow = React.createClass({
   render: function () {
-    return <div>CanvasWindow</div>;
+    return <div>CanvasWindow
+      <CanvasTile/>
+      <CanvasTile/>
+      <CanvasTile/>
+      <CanvasTile/>
+    </div>;
   }
 });
 
-exports.render = function (parent) {
-  var CanvasWindow = exports.CanvasWindow;
-  return React.renderComponent(<CanvasWindow />, parent);
+module.exports = CanvasWindow;
+
+CanvasWindow.safeRender = function (parent) {
+  return React.renderComponent(<CanvasWindow/>, parent);
 };

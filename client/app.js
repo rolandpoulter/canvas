@@ -29,8 +29,6 @@ function initApp() {
   require('./io/view.js');
   require('./io/wall.js');
 
-  app.ui.canvas_tile = require('./ui/canvas_tile.jsx');
-  app.ui.canvas_window = require('./ui/canvas_window.jsx');
-
-  app.ui.canvas_window.render(global.document.body);
+  require('./ui/canvas_window.jsx')
+    .safeRender(global.document.body);
 }
