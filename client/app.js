@@ -7,7 +7,8 @@ global.app = exports;
 app.$ = global.jQuery;
 app.events = global.events;
 
-app.model = require('./model.js');
+app.io = {};
+app.ui = {};
 
 global.jQuery.ajax({
   url: '/config',
@@ -21,6 +22,15 @@ global.jQuery.ajax({
 });
 
 function initApp() {
-  app.io = require('./io.js');
-  app.ui = require('./ui.js');
+  require('./ws.js');
+
+  require('./io/entity.js');
+  require('./io/session.js');
+  require('./io/view.js');
+  require('./io/wall.js');
+
+  app.ui.canvas_tile = require('./ui/canvas_tile.jsx');
+  app.ui.canvas_window = require('./ui/canvas_window.jsx');
+
+  app.ui.canvas_window.render(global.document.body);
 }
