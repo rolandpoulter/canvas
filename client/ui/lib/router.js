@@ -41,7 +41,7 @@ function render(context) {
 		context.route.before_render(context, last_context);
 	}
   var view = context.route.view || layouts.main;
-  debugger;
+  // debugger;
   var html = view.render(context.scope, partials);
 	context.view = jQuery(html);
 	context.view.appendTo(document.body);
