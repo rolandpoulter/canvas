@@ -1,9 +1,36 @@
 'use strict';/*global React*/
 
-var CanvasTile = React.createClass({
-  render: function () {
-    return <div>CanvasTile</div>;
-  }
-});
+module.exports =
+global.CanvasTile = React.createClass({
+  getDefaultProps: function () {
+    this.tileCache = [];
+    return {
+      hash: null,
+      tileSize: 512
+    };
+  },
 
-module.exports = CanvasTile;
+  getInitialState: function () {
+    return {
+    };
+  },
+
+  render: function () {
+    /*jshint white:false*/
+    var hash = this.props.hash,
+        tileSize = this.props.tileSize;
+    var styles = {
+      width: tileSize,
+      height: tileSize,
+      left: (hash % 2) * tileSize,
+      top: Math.floor(hash / 2) * tileSize
+    };
+    return (
+      <div className="canvas-tile" style={styles}>
+        <canvas width={tileSize} height={tileSize}/>
+      </div>
+    );
+  },
+
+  intersectsWindow: function () {}
+});

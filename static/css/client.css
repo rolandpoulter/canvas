@@ -6163,3 +6163,13 @@ button.close {
     display: none !important;
   }
 }
+body {
+  overflow: hidden;
+}
+.canvas-wall {
+  background: #333;
+}
+.canvas-tile {
+  border: 1px solid #888;
+  position: absolute;
+}
