@@ -1,6 +1,16 @@
 'use strict';/*global React*/
 
+// TODO:
+// consider changing the world space to screen space transition
+// it would be neat if I used the window scrollTop and scrollLeft
+// properties for translation, then I would get scrolling around for free.
+//
+// I would need to make a giant div element to represent the entire wall
+// then scroll to the center and update the math
+
 var CanvasTile = require('./canvas_tile.jsx');
+
+Number.MAX_SCREEN_OFFSET = 33554428;
 
 module.exports =
 global.CanvasWindow = React.createClass({
@@ -8,25 +18,74 @@ global.CanvasWindow = React.createClass({
     this.tileCache = [];
     return {
       depth: 64,
-      fidelity: 2,
-      initialX: 0.5,
-      initialY: 0.5
+      fidelity: 1,
+      initialX: 0,
+      initialY: 0,
+      maxWorldSize: Number.MAX_SCREEN_OFFSET,
+      tileScreenSize: 512,
     };
   },
 
   getInitialState: function () {
-    return {
-      x: this.props.initialY,
-      y: this.props.initialX,
-      z: this.depthToZ(this.props.depth),
+    var p = this.props,
+        x = p.initialX,
+        y = p.initialY,
+        w = global.innerWidth,
+        h = global.innerHeight,
+        w2 = w / 2,
+        h2 = h / 2,
+        s = p.maxWorldSize / p.fidelity;
+    this.state = {
+      x: x,
+      y: y,
+      z: this.depthToZ(p.depth),
       ratio: this.getWindowAspectRatio(),
-      worldSize: Number.MAX_VALUE / this.props.fidelity,
-      tileScreenSize: 512,
+      worldSize: p.maxWorldSize / p.fidelity,
+      screenOffsetX: w2,
+      screenOffsetY: h2,
       styles: {
-        width: global.innerWidth,
-        height: global.innerHeight
+        width: w,
+        height: h,
+        top: h2 - y * s,
+        left: w2 - x * s
       }
     };
+    var aabb = this.getAABB(),
+        c1 = this.screenSpaceToWorldSpace(aabb[0], aabb[1]),
+        c2 = this.screenSpaceToWorldSpace(aabb[2], aabb[3]);
+    console.log(
+      this.state.styles,
+      aabb,
+      c1,
+      c2,
+      this.worldSpaceToScreenSpace(c1.x, c1.y),
+      this.worldSpaceToScreenSpace(c2.x, c2.y));
+    return this.state;
+  },
+
+  handleResize: function () {
+    var p = this.props,
+        x = this.state.x,
+        y = this.state.y,
+        w = global.innerWidth,
+        h = global.innerHeight,
+        w2 = w / 2,
+        h2 = h / 2,
+        s = p.maxWorldSize / p.fidelity;
+    this.setState({
+      ratio: this.getWindowAspectRatio(),
+      screenOffsetX: w2,
+      screenOffsetY: h2,
+      styles: {
+        width: w,
+        height: h,
+        top: h2 - y * s,
+        left: w2 - x * s
+      }
+    });
+    // console.log(this.state.styles);
+    this.lazyFillTiles();
+    this.lazyCullTiles();
   },
 
   getWindowAspectRatio: function () {
@@ -50,32 +109,35 @@ global.CanvasWindow = React.createClass({
 
   screenSpaceToWorldSpace: function (x, y, depth, context) {
     context = context || {};
-    // TODO:
-    context.x = x;
-    context.y = y;
+    var s = this.state;
+    context.x = (x - s.screenOffsetX) / s.worldSize;
+    context.y = (y - s.screenOffsetY) / s.worldSize;
     if (depth) context.z = this.depthToZ(depth);
     return context;
   },
 
   worldSpaceToScreenSpace: function (x, y, z, context) {
     context = context || {};
-    // TODO:
-    context.x = x;
-    context.y = y;
+    var s = this.state;
+    context.x = (x * s.worldSize);// + s.screenOffsetX;
+    context.y = (y * s.worldSize);// + s.screenOffsetY;
     if (z) context.depth = this.zToDepth(z);
     return context;
   },
 
-  handleResize: function () {
-    this.setState({
-      ratio: this.getWindowAspectRatio(),
-      styles: {
-        width: global.innerWidth,
-        height: global.innerHeight
-      }
-    });
-    this.lazyFillTiles();
-    this.lazyCullTiles();
+  getAABB: function (element) {
+    var b = element || global.document.body,
+        x1 = b.offsetLeft,
+        y1 = b.offsetTop,
+        p = b.offsetParent;
+    while (p) {
+      x1 += p.offsetLeft;
+      y1 += p.offsetTop;
+      p = p.offsetParent;
+    }
+    var x2 = x1 + b.offsetWidth,
+        y2 = y1 + (b.offsetHeight || global.innerHeight);
+    return [x1, y1, x2, y2];
   },
 
   lazyFillTiles: function () {
@@ -98,7 +160,9 @@ global.CanvasWindow = React.createClass({
       });
       /*jshint white:false*/
       if (!exists) new_tiles.push(
-        <CanvasTile hash={hash} tileSize={canvas_window.props.tileSize}/>
+        <CanvasTile key={hash}
+                    hash={hash}
+                    tileSize={canvas_window.props.tileSize}/>
       );
       /*jshint white:true*/
     });
@@ -171,6 +235,7 @@ CanvasWindow.safeRender = function (props) {
   /*jshint white:false*/
   var canvas_window = <CanvasWindow
     depth={props.depth}
+    parent={this}
     fidelity={props.fidelity}
     initialX={props.initialX}
     initialY={props.initialY}/>;

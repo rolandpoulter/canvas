@@ -5,7 +5,9 @@ global.CanvasTile = React.createClass({
   getDefaultProps: function () {
     this.tileCache = [];
     return {
+      key: null,
       hash: null,
+      parent: null,
       tileSize: 512
     };
   },
@@ -22,8 +24,8 @@ global.CanvasTile = React.createClass({
     var styles = {
       width: tileSize,
       height: tileSize,
-      left: (hash % 2) * tileSize,
-      top: Math.floor(hash / 2) * tileSize
+      left: -(hash % 2) * tileSize,
+      top: -Math.floor(hash / 2) * tileSize
     };
     return (
       <div className="canvas-tile" style={styles}>

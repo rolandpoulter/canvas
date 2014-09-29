@@ -25,7 +25,7 @@ function error(err) {
 }
 
 function compileLess() {
-  gulp.src('./client/**/*.less')
+  gulp.src('./client/css/*.less')
     .pipe(less({
       paths: [
         path.join(__dirname, '..', 'node_modules', 'bootstrap', 'less')

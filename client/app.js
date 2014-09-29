@@ -31,9 +31,9 @@ function initApp() {
 
   require('./ui/canvas_window.jsx').safeRender({
     parent: global.document.body,
-    depth: 64,
-    fidelity: 2,
-    initialX: 0.5,
-    initialY: 0.5
+    // depth: 64,
+    // fidelity: 1,
+    // initialX: 0.00000001,
+    // initialY: 0.00000001
   });
 }
