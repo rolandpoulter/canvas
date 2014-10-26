@@ -1,4 +1,4 @@
-'use strict';/*global React*/
+'use strict';/*global React, window*/
 
 // TODO:
 // consider changing the world space to screen space transition
@@ -10,21 +10,59 @@
 
 var CanvasTile = require('./canvas_tile.jsx');
 
-Number.MAX_SCREEN_OFFSET = 33554428;
+Number.MAX_CSS_VALUE = 33554400;
+// Number.HALF_MAX_CSS_VALUE =
+//   Math.floor(Number.MAX_CSS_VALUE / 2);
 
 module.exports =
 global.CanvasWindow = React.createClass({
   getDefaultProps: function () {
     this.tileCache = [];
-    return {
+    this.state = {
+      scale: 0,
       depth: 64,
       fidelity: 1,
       initialX: 0,
       initialY: 0,
-      maxWorldSize: Number.MAX_SCREEN_OFFSET,
-      tileScreenSize: 512,
+      maxWorldSize: Number.MAX_CSS_VALUE,
+      tileScreenSize: 512
     };
+    // this.state.halfMaxWorldSize =
+    //   Math.floor(this.state.maxWorldSize / 2);
+    return this.state;
   },
+
+  // getInitialState: function () {
+  //   var p = this.props,
+  //       x = p.initialX,
+  //       y = p.initialY,
+  //       w = global.innerWidth,
+  //       h = global.innerHeight,
+  //       w2 = w / 2,
+  //       h2 = h / 2,
+  //       s = Math.min(p.maxWorldSize, p.maxWorldSize / p.fidelity);
+  //   this.state = {
+  //     x: x,
+  //     y: y,
+  //     scale: this.depthToScale(p.depth),
+  //     ratio: this.getWindowAspectRatio(),
+  //     worldSize: s,
+  //     screenOffsetX: w2,
+  //     screenOffsetY: h2,
+  //     styles: {
+  //       width: s,
+  //       height: s,
+  //     }
+  //   };
+  //   this.state.halfWorldSize =
+  //     Math.floor(this.worldSize / 2);
+  //   setTimeout(function () {
+  //     window.scrollTo(
+  //       s * x + s / 2 - w2,
+  //       s * y + s / 2 - h2);
+  //   }, 1250);
+  //   return this.state;
+  // },
 
   getInitialState: function () {
     var p = this.props,
@@ -63,6 +101,34 @@ global.CanvasWindow = React.createClass({
     return this.state;
   },
 
+  // handleResize: function () {
+  //   var ls = this.state,
+  //       x = ls.x,
+  //       y = ls.y,
+  //       w = global.innerWidth,
+  //       h = global.innerHeight,
+  //       w2 = w / 2,
+  //       h2 = h / 2,
+  //       s = ls.worldSize;
+  //   this.state = {
+  //     x: x,
+  //     y: y,
+  //     scale: ls.scale,
+  //     ratio: this.getWindowAspectRatio(),
+  //     worldSize: s,
+  //     screenOffsetX: w2,
+  //     screenOffsetY: h2,
+  //     styles: {
+  //       width: s,
+  //       height: s,
+  //     }
+  //   };
+  //   window.scrollTo(
+  //     s * x + s / 2 - w2,
+  //     s * y + s / 2 - h2);
+  //   return this.state;
+  // },
+
   handleResize: function () {
     var p = this.props,
         x = this.state.x,
@@ -84,19 +150,19 @@ global.CanvasWindow = React.createClass({
       }
     });
     // console.log(this.state.styles);
-    this.lazyFillTiles();
-    this.lazyCullTiles();
+    // this.lazyFillTiles();
+    // this.lazyCullTiles();
   },
 
   getWindowAspectRatio: function () {
     return global.innerWidth / global.innerHeight;
   },
 
-  depthToZ: function (depth) {
+  depthToScale: function (depth) {
     return 1 / (depth * 2);
   },
 
-  zToDepth: function () {
+  scaleToDepth: function () {
     var lowestZ = this.depthToZ(1),
         depth = 1,
         z = this.state.z;
@@ -112,7 +178,7 @@ global.CanvasWindow = React.createClass({
     var s = this.state;
     context.x = (x - s.screenOffsetX) / s.worldSize;
     context.y = (y - s.screenOffsetY) / s.worldSize;
-    if (depth) context.z = this.depthToZ(depth);
+    if (depth) context.z = this.depthToScale(depth);
     return context;
   },
 
@@ -121,7 +187,7 @@ global.CanvasWindow = React.createClass({
     var s = this.state;
     context.x = (x * s.worldSize);// + s.screenOffsetX;
     context.y = (y * s.worldSize);// + s.screenOffsetY;
-    if (z) context.depth = this.zToDepth(z);
+    if (z) context.depth = this.scaleToDepth(z);
     return context;
   },
 
