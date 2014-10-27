@@ -29,11 +29,7 @@ function initApp() {
   require('./io/view.js');
   require('./io/wall.js');
 
-  require('./ui/canvas_window.jsx').safeRender({
+  require('./ui/canvas_scroll.jsx').safeRender({
     parent: global.document.body,
-    // depth: 64,
-    // fidelity: 1,
-    // initialX: 0.00000001,
-    // initialY: 0.00000001
   });
 }

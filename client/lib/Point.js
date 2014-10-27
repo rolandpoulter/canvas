@@ -1,26 +1,66 @@
-// https://github.com/jrhdoty/generic-quadtree
-'use strict';
+'use strict';/*global window*/
 
-module.exports = Point;
-global.Point = Point;
+require('./Rect.js');
 
-//two dimensional point
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
+module.exports = global.Point = Point;
+
+function Point(x, y, z, s) {
+  this.x = x || 0; // x-axis coordinate
+  this.y = y || 0; // y-axis coordinate
+  this.z = z || 0; // layer depth
+  this.s = s || 0; // size scale
 }
 
-//less than or equal to in both dimensions
-Point.prototype.lte = function (point) {
-  return (this.x <= point.x && this.y <= point.y);
+Point.prototype.toScreenSpace = function (viewX, viewY, viewScale) {
+  viewScale = viewScale || 1;
+  var w = window.innerWidth,
+      h = window.innerHeight,
+      W = w / 2 + viewX,
+      H = h / 2 + viewY;
+  return new Point(
+    (this.x * viewScale) + W,
+    (this.y * viewScale) + H);
 };
 
-//greater than or equal to in both dimensions
-Point.prototype.gte = function (point) {
-  return (this.x >= point.x && this.y >= point.y);
+Point.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
+  viewScale = viewScale || 1;
+  var w = window.innerWidth,
+      h = window.innerHeight,
+      W = w / 2 - viewX,
+      H = h / 2 - viewY;
+  return new Point(
+    (this.x / viewScale) - W,
+    (this.y / viewScale) - H);
 };
 
-//return true if points are equal in both dimensions
-Point.prototype.equals = function (point) {
-  return (this.x === point.x  && this.y === point.y);
+Point.prototype.toRectFromCenter = function (width, height) {
+  var w = width / 2,
+      h = height / 2;
+  return global.Rect(
+    this.x - w,
+    this.y - h,
+    this.x + w,
+    this.y + h);
+};
+
+Point.prototype.toRectFromTopLeft = function (width, height) {
+  return global.Rect(
+    this.x,
+    this.y,
+    this.x + width,
+    this.y + height);
+};
+
+Point.prototype.toRectFromBottomRight = function (width, height) {
+  return global.Rect(
+    this.x - width,
+    this.y - height,
+    this.x,
+    this.y);
+};
+
+Point.prototype.translate = function (x, y) {
+  if (y === undefined) y = x;
+  this.x += x;
+  this.y += y;
 };

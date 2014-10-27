@@ -1,151 +1,186 @@
-// https://github.com/jrhdoty/generic-quadtree
 'use strict';
 
-module.exports = Quadtree;
-global.Quadtree = Quadtree;
+require('./Rect.js');
 
-require('./Box');
+module.exports = global.Quadtree = Quadtree;
 
-function Quadtree(box, max) {
-  this.box = box;
-  this.children = null;
-  this.value = [];
-  this.max = max || 10; //max points per node
+/**
+ * Quadtree Constructor
+ * @param Rect bounds
+ * @param Integer max_objects (optional, default: 10)
+ *        Max objects a node can hold before splitting into 4 subnodes
+ * @param Integer max_levels (optional, default: 4)
+ *        Total max levels inside root Quadtree
+ * @param Integer level (optional)
+ *        Depth level, required for subnodes.
+ */
+function Quadtree(rect, level, max_objects, max_levels) {
+  this.max_objects = max_objects || 10;
+  this.max_levels  = max_levels || 4;
+  this.objects = [];
+  this.nodes   = [null, null, null, null];
+  this.level = level || 0;
+  this.rect  = rect;
 }
 
-Quadtree.prototype.insert = function (point, object) {
-  /*jshint maxstatements:20*/
-  //check if should contain point
-  if (!this.box.contains(point)) {
-    return this;
-  }
 
-  //if is a leaf node and not full, then insert
-  //need to check if it already exists though
-  var i;
-  if (this.children === null && this.value.length < this.max) {
-    for (i = 0; i < this.value.length; i++) {
-      if (this.value[i].point.equals(point)) {
-        this.value[i].value = object;
-        return;
-      }
-    }
-    this.value.push({point: point, value: object});
-    return this;
-  }
+/*
+ * Split the node into 4 subnodes.
+ */
+Quadtree.prototype.split = function () {
+  var Rect = global.Rect,
+      mO = this.max_objects,
+      mL = this.max_levels,
+      L = this.level + 1, // next level
+      w = this.rect.getWidth(),
+      h = this.rect.getHeight(),
+      W = w / 2, // sub width
+      H = h / 2, // sub height
+      x = this.rect.left,
+      y = this.rect.top,
+      X = this.rect.right,
+      Y = this.rect.bottom;
 
-  //if is a leaf node but full, call subdivide
-  if (this.children === null) {
-    this.subdivide();
-  }
+  // top right node
+  this.nodes[0] = new Quadtree(new Rect(x + W, y, X, y + H), L, mO, mL);
 
-  // if is not a leaf node, call insert on child nodes
-  for (i = 0; i < this.children.length; i++) {
-    this.children[i].insert(point, object);
-  }
-  this.value = [];
-  return this;
+  // top left node
+  this.nodes[1] = new Quadtree(new Rect(x, y, x + W, y + H), L, mO, mL);
+
+  // bottom left node
+  this.nodes[2] = new Quadtree(new Rect(x, y + H, x + W, Y), L, mO, mL);
+
+  // bottom right node
+  this.nodes[3] = new Quadtree(new Rect(x + W, y + H, X, Y), L, mO, mL);
 };
 
-Quadtree.prototype.subdivide = function () {
-  //use box quadrant method to create 4 new equal child quadrants
-  this.children = this.box.split();
-  for (var i = 0; i < this.children.length; i++) {
-    this.children[i] = new Quadtree(this.children[i], this.max);
+
+/*
+ * Determine which node the object belongs to.
+ * @param Rect object bounds
+ * @return Integerindex of the subnode (0-3),
+ *         or -1 if pRect cannot completely fit within
+ *         a subnode and is part of the parent node
+ */
+Quadtree.prototype.getIndex = function (rect) {
+  var index = -1,
+      center = this.rect.getCenter(),
+      verticalMidpoint = center.x,
+      horizontalMidpoint = center.y,
+      // rect can completely fit within the top quadrants
+      topQuadrant = (rect.top < horizontalMidpoint &&
+                     rect.bottom < horizontalMidpoint),
+      // rect can completely fit within the bottom quadrants
+      bottomQuadrant = (rect.top > horizontalMidpoint);
+
+  // rect can completely fit within the left quadrants
+  if (rect.left < verticalMidpoint && rect.right < verticalMidpoint) {
+    if (topQuadrant)
+      index = 1;
+
+    else if (bottomQuadrant)
+      index = 2;
   }
-  //try inserting each value into the new child nodes
-  for (i = 0; i < this.value.length; i++) {
-    for (var k = 0; k < this.children.length; k++) {
-      this.children[k].insert(this.value[i].point, this.value[i].value);
+
+  // rect can completely fit within the right quadrants
+  else if (rect.left > verticalMidpoint) {
+    if (topQuadrant)
+      index = 0;
+
+    else if (bottomQuadrant)
+      index = 3;
+  }
+
+  return index;
+};
+
+
+/*
+ * Insert the object into the node. If the node
+ * exceeds the capacity, it will split and add all
+ * objects to their corresponding subnodes.
+ * @param Rect
+ *        bounds of the object to be added, with x, y, width, height
+ */
+Quadtree.prototype.insert = function (rect, ref) {
+  /*jshint maxstatements:15*/
+  var i = 0,
+      index;
+
+  // if we have subnodes...
+  if (this.nodes[0]) {
+    index = this.getIndex(rect);
+
+    if (index !== -1) {
+      this.nodes[index].insert(rect);
+      return;
+    }
+  }
+
+  if (ref) rect.setRef(ref);
+
+  this.objects.push(rect);
+
+  if (this.objects.length > this.max_objects && this.level < this.max_levels) {
+    // split if we don't already have subnodes
+    if (!this.nodes[0]) this.split();
+
+    //add all objects to there corresponding subnodes
+    while (i < this.objects.length) {
+      index = this.getIndex(this.objects[i]);
+
+      if (index !== -1)
+        this.nodes[index].insert(
+          this.objects.splice(i, 1)[0]);
+
+      else
+        i = i + 1;
     }
   }
 };
 
-Quadtree.prototype.queryRange = function (box) {
-  //return all point/value pairs contained in range
-  var result = [];
-  this._queryRangeRec(box, result);
-  return result;
+
+/*
+ * Return all objects that could collide with the given object
+ * @param Rect
+ *        bounds of the object to be checked, with x, y, width, height
+ * @Return Array with all detected objects
+ */
+Quadtree.prototype.retrieve = function (rect) {
+  var index = this.getIndex(rect),
+      objects = this.objects,
+      i = 0;
+
+  // if we have subnodes...
+  if (this.nodes[0]) {
+
+    // if rect fits into a subnode...
+    if (index !== -1)
+      objects = objects.concat(
+        this.nodes[index].retrieve(rect));
+
+    //if pRect does not fit into a subnode, check it against all subnodes
+    else
+      for (; i < this.nodes.length; i += 1)
+        objects = objects.concat(
+          this.nodes[i].retrieve(rect));
+  }
+
+  return objects;
 };
 
-Quadtree.prototype._queryRangeRec = function (box, result) {
-  /*jshint maxstatements:20*/
-  //if query area doesn't overlap this box then return
-  if (!this.box.overlaps(box)) {
-    return;
-  }
-  //if leaf node with contained value(s), then check against contained objects
-  var i;
-  if (this.value.length > 0) {
-    for (i = 0; i < this.value.length; i++) {
-      if (box.contains(this.value[i].point)) {
-        result.push(this.value[i]);
-      }
-    }
-    return;
-  }
-  //if has children, then make recursive call on children
-  if (this.children !== null) {
-    for (i = 0; i < this.children.length; i++) {
-      this.children[i]._queryRangeRec(box, result);
-    }
-    return;
-  }
-};
 
-Quadtree.prototype.queryPoint = function (point) {
-  /*jshint maxstatements:20*/
-  //return value if tree contains point
-  if (!this.box.contains(point)) {
-    return null;
-  }
-
-  if (this.value.length > 0) {
-    for (var i = 0; i < this.value.length; i++) {
-      if (this.value[i].point.equals(point)) {
-        return this.value[i].value;
-      }
-    }
-  }
-
-  if (this.children !== null) {
-    var val = null;
-    for (var k = 0; k < this.children.length; k++) {
-      val = val || this.children[k].queryPoint(point);
-    }
-    return val;
-  }
-  return null;
-};
-
-Quadtree.prototype.removePoint = function (point) {
-  /*jshint maxstatements:20*/
-  //return if tree doesn't contain point
-  if (!this.box.contains(point)) {
-    return;
-  }
-
-  var i;
-  if (this.value.length > 0) {
-    for (i = 0; i < this.value.length; i++) {
-      if (this.value[i].point.equals(point)) {
-        this.value.splice(i, 1);
-        return;
-      }
-    }
-    return; // didn't contain point and is leaf node
-  }
-
-  var k;
-  if (this.children !== null) {
-    for (k = 0; k < this.children.length; k++) {
-      this.children[k].removePoint(point);
-    }
-  }
-  return;
-};
-
+/*
+ * Clear the quadtree
+ */
 Quadtree.prototype.clear = function () {
-  this.children = null;
-  this.value = [];
+  this.objects = [];
+
+  var i = 0;
+
+  for (; i < this.nodes.length; i += 1)
+    if (this.nodes[i]) {
+      this.nodes[i].clear();
+      this.nodes[i] = null;
+    }
 };

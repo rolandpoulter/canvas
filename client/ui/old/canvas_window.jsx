@@ -1,4 +1,4 @@
-'use strict';/*global React, window*/
+'use strict';/*global React*/
 
 // TODO:
 // consider changing the world space to screen space transition
@@ -306,15 +306,4 @@ CanvasWindow.safeRender = function (props) {
     initialX={props.initialX}
     initialY={props.initialY}/>;
   return React.renderComponent(canvas_window, props && props.parent);
-};
-
-Array.prototype.quadtreeAABB = function (cb) {
-  cb(0);
-  cb(1);
-  cb(2);
-  cb(3);
-};
-
-Array.prototype.quadtreeIndex = function (x, y, depth) {
-  return depth; // TODO:
 };
