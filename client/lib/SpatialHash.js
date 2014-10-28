@@ -14,8 +14,6 @@ function SpatialHash(powerOfTwo) {
   this._powerOfTwo = powerOfTwo || DEFAULT_POWER_OF_TWO;
 
   this.hash = {};
-
-  // this.list = [];
 }
 
 

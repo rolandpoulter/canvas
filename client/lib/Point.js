@@ -34,9 +34,11 @@ Point.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
 };
 
 Point.prototype.toRectFromCenter = function (width, height) {
+  width = width || 1;
+  height = height || width;
   var w = width / 2,
       h = height / 2;
-  return global.Rect(
+  return new global.Rect(
     this.x - w,
     this.y - h,
     this.x + w,
@@ -44,7 +46,9 @@ Point.prototype.toRectFromCenter = function (width, height) {
 };
 
 Point.prototype.toRectFromTopLeft = function (width, height) {
-  return global.Rect(
+  width = width || 1;
+  height = height || width;
+  return new global.Rect(
     this.x,
     this.y,
     this.x + width,
@@ -52,7 +56,9 @@ Point.prototype.toRectFromTopLeft = function (width, height) {
 };
 
 Point.prototype.toRectFromBottomRight = function (width, height) {
-  return global.Rect(
+  width = width || 1;
+  height = height || width;
+  return new global.Rect(
     this.x - width,
     this.y - height,
     this.x,

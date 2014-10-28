@@ -1,0 +1,15 @@
+'use strict';
+require('../lib/bootstrap.lib.js');
+
+/*global describe, it, before, beforeEach, afterEach, after*/
+/*global group, unit*/
+
+describe('group', function () {
+  before(function () {});
+  after(function () {});
+  beforeEach(function () {});
+  afterEach(function () {});
+  it('unit', function () {
+    return true.should.be.ok;
+  });
+});

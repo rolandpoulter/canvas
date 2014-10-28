@@ -116,6 +116,15 @@ Rect.prototype.containsRect = function (rect) {
   return true;
 };
 
+Rect.prototype.scale = function (x, y) {
+  x = x || 1;
+  y = y || x;
+  this.left *= x;
+  this.right *= x;
+  this.top *= y;
+  this.bottom *= y;
+};
+
 Rect.prototype.translate = function (x, y) {
   x = x || 0;
   y = y || 0;

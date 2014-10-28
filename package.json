@@ -62,14 +62,14 @@
     "websocket-multiplex": "^0.1.0"
   },
   "devDependencies": {
-    "chai": "^1.9.1",
+    "chai": "^1.9.2",
     "gulp": "^3.8.8",
     "gulp-less": "^1.3.6",
     "gulp-util": "^3.0.1",
     "gulp-webpack": "^0.3.0",
-    "mocha": "^1.21.4",
-    "sinon": "^1.10.3",
-    "sinon-chai": "^2.5.0"
+    "mocha": "^2.0.1",
+    "sinon": "^1.11.1",
+    "sinon-chai": "^2.6.0"
   },
   "jshintConfig": {
     "node": true,
