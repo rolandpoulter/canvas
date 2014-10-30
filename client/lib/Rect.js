@@ -16,6 +16,22 @@ Rect.prototype.setRef = function (object) {
   this.ref = object;
 };
 
+Rect.prototype.toScreenSpace = function (viewX, viewY, viewScale) {
+  var a = new global.Point(this.left, this.top),
+      b = new global.Point(this.right, this.bottom);
+  a = a.toScreenSpace(viewX, viewY, viewScale);
+  b = b.toScreenSpace(viewX, viewY, viewScale);
+  return new Rect(a.x, -a.y, b.x, -b.y);
+};
+
+Rect.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
+  var a = new global.Point(this.left, this.top),
+      b = new global.Point(this.right, this.bottom);
+  a = a.toWorldSpace(viewX, viewY, viewScale);
+  b = b.toWorldSpace(viewX, viewY, viewScale);
+  return new Rect(a.x, -a.y, b.x, -b.y);
+};
+
 Rect.prototype.isSquare = function () {
   return this.getWidth() === this.getHeight();
 };
@@ -55,10 +71,10 @@ Rect.prototype.getAspectRatio = function () {
 };
 
 Rect.prototype.intersectRect = function (rect) {
-  return !(rect.left > this.right ||
-           rect.right < this.left ||
-           rect.top > this.bottom ||
-           rect.bottom < this.top);
+  return !(this.left   > rect.right  ||
+           this.right  < rect.left   ||
+           this.top    < rect.bottom ||
+           this.bottom > rect.top);
 };
 
 Rect.prototype.containsPoint = function (point) {
@@ -67,53 +83,10 @@ Rect.prototype.containsPoint = function (point) {
 };
 
 Rect.prototype.containsRect = function (rect) {
-  /*jshint bitwise:false, maxstatements:20, maxcomplexity:25*/
-  var w = this.getWidth(),
-      h = this.getHeight(),
-      W = this.getWidth(),
-      H = this.getHeight();
-
-  // At least one of the dimensions is negative...
-  if ((w | h | W | H) < 0) return false;
-
-  // Note: if any dimension is zero, tests below must return false...
-  var x = this.left,
-      y = this.top,
-      X = rect.left,
-      Y = rect.top;
-
-  if (X < x || Y < y) return false;
-
-  w += x;
-  W += X;
-
-  if (W <= X) {
-    // X+W overflowed or W was zero, return false if...
-    // either original w or W was zero or
-    // x+w did not overflow or
-    // the overflowed x+w is smaller than the overflowed X+W
-    if (w >= x || W > w) return false;
-  }
-
-  else {
-    // X+W did not overflow and W was not zero, return false if...
-    // original w was zero or
-    // x+w did not overflow and x+w is smaller than X+W
-    if (w >= x && W > w) return false;
-  }
-
-  h += y;
-  H += Y;
-
-  if (H <= Y) {
-    if (h >= y || H > h) return false;
-  }
-
-  else {
-    if (h >= y && H > h) return false;
-  }
-
-  return true;
+  return this.left   < rect.left  &&
+         this.right  > rect.right &&
+         this.top    > rect.top   &&
+         this.bottom < rect.bottom;
 };
 
 Rect.prototype.scale = function (x, y) {

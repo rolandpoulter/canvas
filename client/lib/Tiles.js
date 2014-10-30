@@ -88,33 +88,28 @@ Tiles.prototype.getNearestQuadtree = function (rect, scale) {
   var node = this.quadtree,
       last,
       index;
-  console.log(rect);
   while (true) {
-    if (!node) return;
+    if (!node) return last;
     if (rect.containsRect(node.rect)) return last;
     if (!node.nodes[0]) node.split();
     last = node;
     index = node.getIndex(rect);
-    console.log(index);
     node = node.nodes[index];
-    console.log('split');
   }
 };
 
 Tiles.prototype.fillView = function (viewRect, tileSize, scale, iterator) {
   scale = scale || 1;
-  var nearestQuadtree = this.getNearestQuadtree(viewRect, scale);
-  if (!nearestQuadtree) return [];
-  var grid = new global.Grid(nearestQuadtree.rect, tileSize, scale);
+  this.getNearestQuadtree(viewRect, scale);
+  var grid = new global.Grid(viewRect, tileSize, scale);
   return grid.generate(iterator);
 };
 
-Tiles.prototype.cullView = function (gridArray, viewRect, scale) {
-  scale = scale || 1;
+Tiles.prototype.cullView = function (gridArray, viewRect) {
   var culled = [];
   gridArray.forEach(function (rowArray) {
     rowArray.forEach(function (cell) {
-      if (cell.intersects(viewRect)) culled.push(cell);
+      if (cell.intersectRect(viewRect)) culled.push(cell);
     });
   });
   return culled;

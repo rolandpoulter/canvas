@@ -1,10 +1,13 @@
 'use strict';
-/*global React*/
+/*global React, Point, window*/
+
+require('../lib/Rect.js');
+require('../lib/Point.js');
 
 var CanvasTile = require('./canvas_tile.jsx');
 
 module.exports =
-global.CanvasScroll = React.createClass({
+global.CanvasView = React.createClass({
   getDefaultProps: function () {
     var state = {};
     return state;
@@ -14,6 +17,14 @@ global.CanvasScroll = React.createClass({
     var state = {
       styles: {}
     };
+    this.rect = new Point(0, 0).toRectFromTopLeft(
+      window.innerWidth,
+      -window.innerHeight);
+    // console.log(this.rect);
+    // this.test = this.rect.toWorldSpace();
+    // console.log(this.test);
+    // console.log(this.test.toScreenSpace());
+    // debugger;
     return state;
   },
 
@@ -21,6 +32,9 @@ global.CanvasScroll = React.createClass({
     var state = {
       styles: {}
     };
+    // this.rect = new Point(0, 0).toRectFromTopLeft(
+    //   window.innerWidth,
+    //   -window.innerHeight);
     return state;
   },
 
@@ -45,15 +59,15 @@ global.CanvasScroll = React.createClass({
   }
 });
 
-var CanvasWindow = module.exports;
+var CanvasView = module.exports;
 
-CanvasWindow.safeRender = function (props) {
+CanvasView.safeRender = function (props) {
   /*jshint white:false*/
-  var canvas_window = <CanvasWindow
-    depth={props.depth}
-    parent={this}
-    fidelity={props.fidelity}
-    initialX={props.initialX}
-    initialY={props.initialY}/>;
+  var canvas_window = <CanvasView/>;
+    // depth={props.depth}
+    // parent={this}
+    // fidelity={props.fidelity}
+    // initialX={props.initialX}
+    // initialY={props.initialY}
   return React.renderComponent(canvas_window, props && props.parent);
 };

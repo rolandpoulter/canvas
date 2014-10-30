@@ -46,15 +46,10 @@ global.CanvasScroll = React.createClass({
   }
 });
 
-var CanvasWindow = module.exports;
+var CanvasScroll = module.exports;
 
-CanvasWindow.safeRender = function (props) {
+CanvasScroll.safeRender = function (props) {
   /*jshint white:false*/
-  var canvas_window = <CanvasWindow
-    depth={props.depth}
-    parent={this}
-    fidelity={props.fidelity}
-    initialX={props.initialX}
-    initialY={props.initialY}/>;
+  var canvas_window = <CanvasScroll/>;
   return React.renderComponent(canvas_window, props && props.parent);
 };

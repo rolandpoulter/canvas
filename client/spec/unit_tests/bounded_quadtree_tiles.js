@@ -6,7 +6,7 @@ require('../lib/bootstrap.lib.js');
 
 describe('Bounded Quadtree Tiles:', function () {
   before(function () {
-    this.bounds = new Point().toRectFromCenter(0.01);
+    this.bounds = new Point(0.0, 0.0).toRectFromCenter(0.01);
     this.tiles = new Tiles({
       scale: 0.5,
       collect: true,
@@ -15,6 +15,20 @@ describe('Bounded Quadtree Tiles:', function () {
   });
 
   after(function () {});
+
+  describe('Intersection:', function () {
+    it('Should intersect.', function () {
+      var a = new Point(0, 0).toRectFromCenter(0.5),
+          b = new Point(0, 0).toRectFromCenter(1);
+      return a.intersectRect(b).should.be.ok;
+    });
+
+    it('Should not intersect.', function () {
+      var a = new Point(20, 20).toRectFromCenter(0.5),
+          b = new Point(0, 0).toRectFromCenter(1);
+      return a.intersectRect(b).should.not.be.ok;
+    });
+  });
 
   withSamples('A', {
     a1: new Rect(-0.1, 0.1, 0.1, -0.1),
@@ -27,16 +41,18 @@ describe('Bounded Quadtree Tiles:', function () {
     });
 
     it('Filling', function () {
-      var filled = this.tiles.fillView(this.bounds, 1, 1);
+      var filled = this.tiles.fillView(this.bounds, 0.1, 0.01);
+      // console.log(filled);
       return filled.length.should.be.ok;
     });
 
-    // it('Culling', function () {
-    //   var filled = this.tiles.fillView(this.bounds, 1, 1),
-    //       culled = this.tiles.cullView(
-    //         filled, new Point().toRectFromCenter(0.005), 1);
-    //   return culled.length.should.be.ok;
-    // });
+    it('Culling', function () {
+      var filled = this.tiles.fillView(this.bounds, 0.1, 0.01),
+          culled = this.tiles.cullView(
+            filled, new Point().toRectFromCenter(1));
+      // console.log(filled);
+      return culled.length.should.be.ok;
+    });
   });
 
   withSamples('B', {
