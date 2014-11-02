@@ -19,7 +19,7 @@ Point.prototype.toScreenSpace = function (viewX, viewY, viewScale) {
       H = h / 2 + (viewY * viewScale);
   return new Point(
     (this.x * viewScale) + W,
-    (this.y * viewScale) - H);
+    (this.y * viewScale) + H);
 };
 
 Point.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
@@ -72,3 +72,13 @@ Point.prototype.translate = function (x, y) {
   this.x += x;
   this.y += y;
 };
+
+// var a = new Point(0, 0).toRectFromCenter(10, 10),
+//     b = new Point(0, 0).toRectFromCenter(5, 5),
+//     c = new Point(0, 0).toRectFromTopLeft(5, 5),
+//     d = new Point(0, 0).toRectFromBottomRight(5, 5);
+//
+// console.log('ab', a.intersectsRect(b));
+// console.log('ac', a.intersectsRect(c));
+// console.log('ad', a.intersectsRect(d));
+// console.log('bd', b.intersectsRect(d));

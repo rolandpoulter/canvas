@@ -1,5 +1,6 @@
 'use strict';
 
+require('./Grid.js');
 require('./Rect.js');
 require('./Quadtree.js');
 require('./SpatialHash.js');
@@ -58,6 +59,17 @@ Tiles.prototype.insert = function (rect, ref) {
   this.spatialHash.insert(rect);
 };
 
+Tiles.prototype.remove = function (rect, fromCollection) {
+  var index;
+  if (this.collection && fromCollection) {
+    while ((index = this.collection.indexOf(rect)) !== -1) {
+      this.collection.splice(index, 1);
+    }
+  }
+  this.quadtree.remove(rect);
+  this.spatialHash.remove(rect);
+};
+
 Tiles.prototype.retreive = function (rect, fromCollection) {
   if (!rect) return this.collection;
   if (this.collection && fromCollection) {
@@ -70,7 +82,7 @@ Tiles.prototype.retreive = function (rect, fromCollection) {
 };
 
 Tiles.prototype.clear = function () {
-  this.collection.length = 0;
+  if (this.collection) this.collection.length = 0;
   this.quadtree.clear();
   this.spatialHash.clear();
 };
@@ -98,19 +110,49 @@ Tiles.prototype.getNearestQuadtree = function (rect, scale) {
   }
 };
 
-Tiles.prototype.fillView = function (viewRect, tileSize, scale, iterator) {
-  scale = scale || 1;
-  this.getNearestQuadtree(viewRect, scale);
-  var grid = new global.Grid(viewRect, tileSize, scale);
-  return grid.generate(iterator);
+Tiles.prototype.resetView = function (viewRect, tileSize, scale, iterator) {
+  if (this.view) {
+    this.view.forEach(function (cell) {
+      if (cell.release) cell.release();
+      // this.remove(cell);
+    }.bind(this));
+  }
+  this.view = [];
+  this.clear();
+  return this.fillView(viewRect, tileSize, scale, iterator);
 };
 
-Tiles.prototype.cullView = function (gridArray, viewRect) {
-  var culled = [];
-  gridArray.forEach(function (rowArray) {
-    rowArray.forEach(function (cell) {
-      if (cell.intersectRect(viewRect)) culled.push(cell);
-    });
-  });
+Tiles.prototype.fillView = function (viewRect, tileSize, scale, iterator) {
+  scale = scale || 1;
+  this.view = this.view || [];
+  var nearestQuadtree = this.getNearestQuadtree(viewRect, scale),
+      quadrantRect = nearestQuadtree.rect,
+      grid = new global.Grid(viewRect, quadrantRect, tileSize, scale);
+  grid.generate(function (cell) {
+    cell = cell.cache();
+    if (iterator) cell = iterator(cell) || cell;
+    this.insert(cell);
+    this.view.push(cell);
+    return cell;
+  }.bind(this));
+  return this.view;
+};
+
+Tiles.prototype.cullView = function (viewRect) {
+  var visible = [],
+      culled = [];
+  this.view.forEach(function (cell) {
+    //debugger;
+    var intersects = cell.intersectsRect(viewRect);
+    // console.log(viewRect, cell, '\n',
+    //   intersects, viewRect.intersectsRect(cell), viewRect.containsRect(cell))
+    if (intersects) visible.push(cell);
+    else {
+      if (cell.release) cell.release();
+      this.remove(cell);
+      culled.push(cell);
+    }
+  }.bind(this));
+  this.view = visible;
   return culled;
 };

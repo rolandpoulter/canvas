@@ -20,13 +20,13 @@ describe('Bounded Quadtree Tiles:', function () {
     it('Should intersect.', function () {
       var a = new Point(0, 0).toRectFromCenter(0.5),
           b = new Point(0, 0).toRectFromCenter(1);
-      return a.intersectRect(b).should.be.ok;
+      return a.intersectsRect(b).should.be.ok;
     });
 
     it('Should not intersect.', function () {
       var a = new Point(20, 20).toRectFromCenter(0.5),
           b = new Point(0, 0).toRectFromCenter(1);
-      return a.intersectRect(b).should.not.be.ok;
+      return a.intersectsRect(b).should.not.be.ok;
     });
   });
 
@@ -42,15 +42,14 @@ describe('Bounded Quadtree Tiles:', function () {
 
     it('Filling', function () {
       var filled = this.tiles.fillView(this.bounds, 0.1, 0.01);
-      // console.log(filled);
       return filled.length.should.be.ok;
     });
 
     it('Culling', function () {
-      var filled = this.tiles.fillView(this.bounds, 0.1, 0.01),
-          culled = this.tiles.cullView(
-            filled, new Point().toRectFromCenter(1));
-      // console.log(filled);
+      this.tiles.fillView(this.bounds, 0.1, 0.01);
+      var culled =
+        this.tiles.cullView(new Point(0.01, 0.01)
+          .toRectFromCenter(0.0001));
       return culled.length.should.be.ok;
     });
   });

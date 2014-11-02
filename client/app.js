@@ -7,6 +7,8 @@ global.app = exports;
 app.$ = global.jQuery;
 app.events = global.events;
 
+global.React.initializeTouchEvents(true);
+
 app.io = {};
 app.ui = {};
 

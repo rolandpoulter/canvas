@@ -62,18 +62,37 @@ SpatialHash.prototype.getNumBuckets = function () {
 SpatialHash.prototype.insert = function (rect, ref) {
   var keys = this.getKeys(rect),
       key,
+      itm,
       i;
 
   if (ref) rect.setRef = ref;
 
   for (i = 0; i < keys.length; i++) {
     key = keys[i];
+    itm = this.hash[key];
 
-    if (this.hash[key])
-      this.hash[key].push(rect);
+    if (itm) itm.push(rect);
 
-    else
-      this.hash[key] = [rect];
+    else this.hash[key] = [rect];
+  }
+};
+
+SpatialHash.prototype.remove = function (rect) {
+  var keys = this.getKeys(rect),
+      key,
+      itm,
+      iof,
+      i;
+
+  for (i = 0; i < keys.length; i++) {
+    key = keys[i];
+    itm = this.hash[key];
+
+    if (itm) {
+      iof = this.hash[key].indexOf(rect);
+
+      if (iof !== -1) this.hash[key].splice(iof, 1);
+    }
   }
 };
 

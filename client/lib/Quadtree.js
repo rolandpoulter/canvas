@@ -139,6 +139,29 @@ Quadtree.prototype.insert = function (rect, ref) {
   }
 };
 
+Quadtree.prototype.remove = function (rect) {
+  /*jshint maxstatements:15*/
+  var index;
+
+  // if we have subnodes...
+  if (this.nodes[0]) {
+    index = this.getIndex(rect);
+
+    if (index !== -1) {
+      this.nodes[index].remove(rect);
+      return;
+    }
+  }
+
+  index = this.objects.indexOf(rect);
+
+  if (index !== -1) {
+    this.objects.splice(index, 1);
+
+    this.remove(rect);
+  }
+};
+
 
 /*
  * Return all objects that could collide with the given object

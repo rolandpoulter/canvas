@@ -4,13 +4,34 @@ require('./Point.js');
 
 module.exports = global.Rect = Rect;
 
-function Rect(left, top, right, bottom) {
+Rect.cache = {};
+
+function Rect(left, top, right, bottom, ref) {
   this.left = left;
   this.top = top;
   this.right = right;
   this.bottom = bottom;
-  this.ref = null;
+  this.ref = ref || null;
 }
+
+Rect.fromCache = function (hash) {
+  return Rect.cache[hash];
+};
+
+Rect.prototype.cache = function () {
+  var hash = [this.left, this.top, this.right, this.bottom].join(':');
+  var existing = Rect.fromCache(hash);
+  if (existing) return existing;
+  this.hash = hash;
+  Rect.cache[hash] = this;
+  return this;
+};
+
+Rect.prototype.release = function () {
+  if (this.hash) {
+    delete Rect.cache[this.hash];
+  }
+};
 
 Rect.prototype.setRef = function (object) {
   this.ref = object;
@@ -70,16 +91,24 @@ Rect.prototype.getAspectRatio = function () {
   return this.getWidth() / this.getHeight();
 };
 
-Rect.prototype.intersectRect = function (rect) {
+Rect.prototype.intersectsRect = function (rect) {
   return !(this.left   > rect.right  ||
            this.right  < rect.left   ||
            this.top    < rect.bottom ||
            this.bottom > rect.top);
 };
 
+Rect.prototype.intersectRect2 = function (rect) {
+  var x = 2 * Math.abs(this.left - rect.left),
+      y = 2 * Math.abs(this.top  - rect.top),
+      w = this.getWidth() + rect.getWidth(),
+      h = this.getHeight() + rect.getHeight();
+  return x < w && y < h;
+};
+
 Rect.prototype.containsPoint = function (point) {
   return point.x > this.left && point.x < this.right &&
-         point.y > this.top && point.y < this.bottom;
+         point.y > this.top  && point.y < this.bottom;
 };
 
 Rect.prototype.containsRect = function (rect) {

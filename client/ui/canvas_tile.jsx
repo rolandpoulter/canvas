@@ -5,31 +5,33 @@ global.CanvasTile = React.createClass({
   getDefaultProps: function () {
     this.tileCache = [];
     return {
-      key: null,
       hash: null,
-      parent: null,
-      tileSize: 512
+      bounds: null,
+      scroll: null,
+      tileSize: 512,
+      initialScreenX: 0,
+      initialScreenY: 0
     };
   },
 
   getInitialState: function () {
     return {
+      style: {
+        height: this.props.tileSize,
+        width: this.props.tileSize,
+        left: this.props.initialScreenX,
+        top:  this.props.initialScreenY
+      }
     };
   },
 
   render: function () {
     /*jshint white:false*/
-    var hash = this.props.hash,
-        tileSize = this.props.tileSize;
-    var styles = {
-      width: tileSize,
-      height: tileSize,
-      left: -(hash % 2) * tileSize,
-      top: -Math.floor(hash / 2) * tileSize
-    };
     return (
-      <div className="canvas-tile" style={styles}>
-        <canvas width={tileSize} height={tileSize}/>
+      <div className="canvas-tile" style={this.state.style}>
+        <span>{this.props.hash}</span>
+        <canvas width={this.props.tileSize}
+                height={this.props.tileSize}/>
       </div>
     );
   },
