@@ -28,7 +28,9 @@ global.CanvasTile = React.createClass({
     /*jshint white:false*/
     return (
       <div className="canvas-tile" style={this.state.style}>
-        <span>{this.props.hash}</span>
+        <div className="hash">
+          {this.props.hash}
+        </div>
         <canvas width={this.props.tile_size}
                 height={this.props.tile_size}/>
       </div>

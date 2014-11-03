@@ -1,31 +1,16 @@
 @import 'bootstrap';
 
-body {
+html, body {
   width: 100%;
   height: 100%;
+  overflow: hidden;
+}
+
+body {
   background: #333;
 }
 
-.canvas-view {
-  width: 100%;
-  height: 100%;
-  span {
-    color: white;
-  }
-}
-
-.canvas-scroll {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.canvas-tile {
-  border: 1px solid #888;
-  border-color: rgba(0.5, 0.5, 0.5, 0.5);
-  border-collapse: collapse;
-  position: absolute;
-
+.canvas-view, .canvas-scroll, .canvas-tile {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -36,8 +21,31 @@ body {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
 
-  span {
-    display: none;
-  }
+.canvas-view, .canvas-scroll {
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-view .position {
+  color: white;
+}
+
+.canvas-view {}
+
+.canvas-scroll {
+  position: relative;
+}
+
+.canvas-tile {
+  border: 1px solid #888;
+  border-color: rgba(0.5, 0.5, 0.5, 0.5);
+  border-collapse: collapse;
+  position: absolute;
+}
+
+.canvas-tile .hash {
+  opacity: 0.5;
+  // display: none;
 }

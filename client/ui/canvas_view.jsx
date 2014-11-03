@@ -69,7 +69,8 @@ global.CanvasView = React.createClass({
     if (!this.mouseMoveFrameWaiting) {
       this.mouseMoveFrameWaiting = true;
 
-      var diffX = this.lastMousePosition.x - event.screenX,
+      var scale = this.state.scale,
+          diffX = this.lastMousePosition.x - event.screenX,
           diffY = this.lastMousePosition.y - event.screenY;
 
       this.captureLastMousePosition(event);
@@ -77,8 +78,8 @@ global.CanvasView = React.createClass({
       // Render on next animation frame.
       window.requestAnimationFrame(function () {
         this.setState({position: new Point(
-          this.state.position.x - diffX,
-          this.state.position.y - diffY)});
+          this.state.position.x - diffX * scale,
+          this.state.position.y - diffY * scale)});
 
         this.updateBounds();
         this.updateTransform();
@@ -96,7 +97,7 @@ global.CanvasView = React.createClass({
   },
 
   getWorldBounds: function () {
-    return this.screenBounds.toWorldSpace(0, 0, 1);
+    return this.screenBounds.toWorldSpace(this.state.scale);
   },
 
   getScreenBounds: function () {
@@ -118,12 +119,17 @@ global.CanvasView = React.createClass({
   },
 
   componentDidMount: function () {
-    global.addEventListener('resize', this.handleResize);
-
+    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('mousedown', this.handleMouseDown);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
   },
 
   componentWillUnmount: function () {
-    global.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('mousedown', this.handleMouseDown);
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('mouseup', this.handleMouseUp);
   },
 
   render: function () {
@@ -133,8 +139,9 @@ global.CanvasView = React.createClass({
            onMouseDown={this.handleMouseDown}
            onMouseMove={this.handleMouseMove}
            onMouseUp={this.handleMouseUp}>
-        <span>{this.state.position.x}</span>,
-        <span>{this.state.position.y}</span>
+        <div className="position">
+          {this.state.position.x},&nbsp;{this.state.position.y}
+        </div>
         <CanvasOverlay/>
         <CanvasScroll view={this}
                       tile_options={this.props.tile_options}/>

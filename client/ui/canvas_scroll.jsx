@@ -21,11 +21,6 @@ global.CanvasScroll = React.createClass({
     this.updateTileView();
 
     this.state = {
-      style: {
-        transform: 'translate(' +
-          this.props.view.state.position.x + ',' +
-          this.props.view.state.position.y + ')'
-      },
       tiles: this.tiles.view
     };
 
