@@ -3,7 +3,8 @@
 
 require('../lib/Point.js');
 
-var CanvasScroll = require('./canvas_scroll.jsx');
+var CanvasScroll = require('./canvas_scroll.jsx'),
+    CanvasOverlay = require('./canvas_overlay.jsx');
 
 module.exports =
 global.CanvasView = React.createClass({
@@ -134,6 +135,7 @@ global.CanvasView = React.createClass({
            onMouseUp={this.handleMouseUp}>
         <span>{this.state.position.x}</span>,
         <span>{this.state.position.y}</span>
+        <CanvasOverlay/>
         <CanvasScroll view={this}
                       tile_options={this.props.tile_options}/>
       </div>

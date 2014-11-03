@@ -167,6 +167,7 @@ Tiles.prototype.cullView = function (viewRect) {
 
     else {
       if (cell.release) cell.release();
+
       this.remove(cell);
       culled.push(cell);
     }
