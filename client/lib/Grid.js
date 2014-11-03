@@ -45,6 +45,10 @@ Grid.prototype.generate = function (iterator) {
     return cell;
   };
 
+  // TODO: find the center of the quadrantRect should be 0, 0
+  //       convert the quad center to screen coorinates
+  //       offset cells by quad center in screen space
+
   for (; yi < yL; yi += S) {
     xi = xI = 0;
     row = grid[yI] = grid[yI] || [];
