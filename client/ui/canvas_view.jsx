@@ -11,7 +11,8 @@ global.CanvasView = React.createClass({
     var state = {
       initial_x: 0,
       initial_y: 0,
-      initial_scale: 1
+      initial_scale: 1,
+      tile_options: {}
     };
     return state;
   },
@@ -19,20 +20,33 @@ global.CanvasView = React.createClass({
   getInitialState: function () {
     this.state = {
       scale: this.props.initial_scale,
-      styles: {},
+      style: {
+        transform: 'translate(' +
+          this.props.initial_x + ',' +
+          this.props.initial_y + ')'
+      },
       position: new Point(this.props.initial_x, this.props.initial_y)
     };
+
     this.screenBounds = this.getScreenBounds();
     this.worldBounds = this.getWorldBounds();
-    // console.log(this.screenBounds, this.worldBounds);
+
     return this.state;
   },
 
   updateBounds: function () {
     this.screenBounds = this.getScreenBounds();
     this.worldBounds = this.getWorldBounds();
-    console.log('sc', this.screenBounds.getCenter());
-    console.log('wc', this.worldBounds.getCenter().toScreenSpace());
+  },
+
+  updateTransform: function () {
+    this.setState({
+      style: {
+        transform: 'translate(' +
+          this.state.position.x + 'px,' +
+          this.state.position.y + 'px)'
+      }
+    });
   },
 
   handleResize: function () {
@@ -49,14 +63,31 @@ global.CanvasView = React.createClass({
 
   handleMouseMove: function (event) {
     if (!this.lastMousePosition) return;
-    var diffX = this.lastMousePosition.x - event.screenX,
-        diffY = this.lastMousePosition.y - event.screenY;
-    this.captureLastMousePosition(event);
-    this.setState({position: new Point(
-      this.state.position.x + diffX,
-      this.state.position.y + diffY)});
-    this.updateBounds();
-    if (this.scroll) this.scroll.updateViewState();
+
+    // Wait till next animation frame in order to queue up another move.
+    if (!this.mouseMoveFrameWaiting) {
+      this.mouseMoveFrameWaiting = true;
+
+      var diffX = this.lastMousePosition.x - event.screenX,
+          diffY = this.lastMousePosition.y - event.screenY;
+
+      this.captureLastMousePosition(event);
+
+      // Render on next animation frame.
+      window.requestAnimationFrame(function () {
+        this.setState({position: new Point(
+          this.state.position.x - diffX,
+          this.state.position.y - diffY)});
+
+        this.updateBounds();
+        this.updateTransform();
+
+        if (this.scroll) this.scroll.updateViewState();
+
+        // Allow another move to queue.
+        delete this.mouseMoveFrameWaiting;
+      }.bind(this));
+    }
   },
 
   handleMouseUp: function () {
@@ -64,17 +95,17 @@ global.CanvasView = React.createClass({
   },
 
   getWorldBounds: function () {
-    return this.screenBounds.toWorldSpace(
-      0,
-      0,
-      this.state.scale);
+    return this.screenBounds.toWorldSpace(0, 0, 1);
   },
 
   getScreenBounds: function () {
     var p = this.state.position;
-    // console.log(p);
+
     return new Point(p.x, p.y)
-      .toRectFromTopLeft(window.innerWidth, -window.innerHeight);
+      .toScreenRect(
+        this.state.scale,
+        window.innerWidth,
+        window.innerHeight);
   },
 
   getWindowSize: function () {
@@ -97,13 +128,14 @@ global.CanvasView = React.createClass({
   render: function () {
     /*jshint white:false*/
     return (
-      <div className="canvas-view" style={this.state.styles}
+      <div className="canvas-view" style={this.state.style}
            onMouseDown={this.handleMouseDown}
            onMouseMove={this.handleMouseMove}
            onMouseUp={this.handleMouseUp}>
         <span>{this.state.position.x}</span>,
         <span>{this.state.position.y}</span>
-        <CanvasScroll view={this}/>
+        <CanvasScroll view={this}
+                      tile_options={this.props.tile_options}/>
       </div>
     );
   }
@@ -113,9 +145,12 @@ var CanvasView = module.exports;
 
 CanvasView.safeRender = function (props) {
   /*jshint white:false*/
-  var canvas_window = <CanvasView
-    initial_x={props.initialX}
-    initial_y={props.initialY}
-    initial_scale={props.initialScale}/>;
-  return React.renderComponent(canvas_window, props && props.parent);
+  var canvas_view =
+    <CanvasView
+      initial_x={props.initialX}
+      initial_y={props.initialY}
+      initial_scale={props.initialScale}
+      tile_options={props.tileOptions}/>;
+
+  return React.renderComponent(canvas_view, props && props.parent);
 };

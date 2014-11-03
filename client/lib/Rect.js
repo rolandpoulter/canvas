@@ -19,11 +19,14 @@ Rect.fromCache = function (hash) {
 };
 
 Rect.prototype.cache = function () {
-  var hash = [this.left, this.top, this.right, this.bottom].join(':');
-  var existing = Rect.fromCache(hash);
+  var hash = [this.left, this.top, this.right, this.bottom].join(':'),
+      existing = Rect.fromCache(hash);
+
   if (existing) return existing;
+
   this.hash = hash;
   Rect.cache[hash] = this;
+
   return this;
 };
 
@@ -40,17 +43,21 @@ Rect.prototype.setRef = function (object) {
 Rect.prototype.toScreenSpace = function (viewX, viewY, viewScale) {
   var a = new global.Point(this.left, this.top),
       b = new global.Point(this.right, this.bottom);
+
   a = a.toScreenSpace(viewX, viewY, viewScale);
   b = b.toScreenSpace(viewX, viewY, viewScale);
-  return new Rect(a.x, -a.y, b.x, -b.y);
+
+  return new Rect(a.x, a.y, b.x, b.y);
 };
 
 Rect.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
   var a = new global.Point(this.left, this.top),
       b = new global.Point(this.right, this.bottom);
+
   a = a.toWorldSpace(viewX, viewY, viewScale);
   b = b.toWorldSpace(viewX, viewY, viewScale);
-  return new Rect(a.x, -a.y, b.x, -b.y);
+
+  return new Rect(a.x, a.y, b.x, b.y);
 };
 
 Rect.prototype.isSquare = function () {
@@ -68,6 +75,7 @@ Rect.prototype.getHeight = function () {
 Rect.prototype.getCenter = function () {
   var w = this.getWidth() / 2,
       h = this.getHeight() / 2;
+
   return new global.Point(this.left + w, this.top + h);
 };
 
@@ -78,12 +86,14 @@ Rect.prototype.getSquareRoot = function () {
 Rect.prototype.getLargestSide = function () {
   var w = this.getWidth(),
       h = this.getHeight();
+
   return w > h ? w : h;
 };
 
 Rect.prototype.getSmalledSide = function () {
   var w = this.getWidth(),
       h = this.getHeight();
+
   return w < h ? w : h;
 };
 
@@ -103,6 +113,7 @@ Rect.prototype.intersectRect2 = function (rect) {
       y = 2 * Math.abs(this.top  - rect.top),
       w = this.getWidth() + rect.getWidth(),
       h = this.getHeight() + rect.getHeight();
+
   return x < w && y < h;
 };
 
@@ -121,6 +132,7 @@ Rect.prototype.containsRect = function (rect) {
 Rect.prototype.scale = function (x, y) {
   x = x || 1;
   y = y || x;
+
   this.left *= x;
   this.right *= x;
   this.top *= y;
@@ -130,6 +142,7 @@ Rect.prototype.scale = function (x, y) {
 Rect.prototype.translate = function (x, y) {
   x = x || 0;
   y = y || 0;
+
   this.left += x;
   this.right += x;
   this.top += y;

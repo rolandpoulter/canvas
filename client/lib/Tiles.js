@@ -43,6 +43,7 @@ function Tiles(options) {/*jshint maxcomplexity:11*/
 
 Tiles.prototype.indexOf = function (rect, fromCollection) {
   if (this.collection && fromCollection) return this.collection.indexOf(rect);
+
   return [
     this.quadtree.getIndex(rect),
     this.spatialHash.getKeys(rect)
@@ -51,30 +52,36 @@ Tiles.prototype.indexOf = function (rect, fromCollection) {
 
 Tiles.prototype.insert = function (rect, ref) {
   if (ref) rect.setRef(ref);
+
   if (this.collection) {
     if (this.unique && this.indexOf(rect, true) !== -1) return;
     this.collection.push(rect);
   }
+
   this.quadtree.insert(rect);
   this.spatialHash.insert(rect);
 };
 
 Tiles.prototype.remove = function (rect, fromCollection) {
   var index;
+
   if (this.collection && fromCollection) {
     while ((index = this.collection.indexOf(rect)) !== -1) {
       this.collection.splice(index, 1);
     }
   }
+
   this.quadtree.remove(rect);
   this.spatialHash.remove(rect);
 };
 
 Tiles.prototype.retreive = function (rect, fromCollection) {
   if (!rect) return this.collection;
+
   if (this.collection && fromCollection) {
     return this.collection[this.indexOf(rect, true)];
   }
+
   return [
     this.spatialHash.retreive(rect),
     this.quadtree.retreive(rect)
@@ -83,6 +90,7 @@ Tiles.prototype.retreive = function (rect, fromCollection) {
 
 Tiles.prototype.clear = function () {
   if (this.collection) this.collection.length = 0;
+
   this.quadtree.clear();
   this.spatialHash.clear();
 };
@@ -97,13 +105,16 @@ Tiles.prototype.depthToScale = function (depth) {
 
 Tiles.prototype.getNearestQuadtree = function (rect, scale) {
   scale = scale || 1;
+
   var node = this.quadtree,
       last,
       index;
+
   while (true) {
     if (!node) return last;
     if (rect.containsRect(node.rect)) return last;
     if (!node.nodes[0]) node.split();
+
     last = node;
     index = node.getIndex(rect);
     node = node.nodes[index];
@@ -114,45 +125,54 @@ Tiles.prototype.resetView = function (viewRect, tileSize, scale, iterator) {
   if (this.view) {
     this.view.forEach(function (cell) {
       if (cell.release) cell.release();
-      // this.remove(cell);
     }.bind(this));
   }
+
   this.view = [];
   this.clear();
+
   return this.fillView(viewRect, tileSize, scale, iterator);
 };
 
 Tiles.prototype.fillView = function (viewRect, tileSize, scale, iterator) {
   scale = scale || 1;
   this.view = this.view || [];
+
   var nearestQuadtree = this.getNearestQuadtree(viewRect, scale),
       quadrantRect = nearestQuadtree.rect,
       grid = new global.Grid(viewRect, quadrantRect, tileSize, scale);
+
   grid.generate(function (cell) {
     cell = cell.cache();
+
     if (iterator) cell = iterator(cell) || cell;
+
     this.insert(cell);
     this.view.push(cell);
+
     return cell;
   }.bind(this));
+
   return this.view;
 };
 
 Tiles.prototype.cullView = function (viewRect) {
   var visible = [],
       culled = [];
+
   this.view.forEach(function (cell) {
-    //debugger;
     var intersects = cell.intersectsRect(viewRect);
-    // console.log(viewRect, cell, '\n',
-    //   intersects, viewRect.intersectsRect(cell), viewRect.containsRect(cell))
+
     if (intersects) visible.push(cell);
+
     else {
       if (cell.release) cell.release();
       this.remove(cell);
       culled.push(cell);
     }
   }.bind(this));
+
   this.view = visible;
+
   return culled;
 };

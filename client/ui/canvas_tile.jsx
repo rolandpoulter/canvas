@@ -3,24 +3,23 @@
 module.exports =
 global.CanvasTile = React.createClass({
   getDefaultProps: function () {
-    this.tileCache = [];
     return {
       hash: null,
       bounds: null,
       scroll: null,
-      tileSize: 512,
-      initialScreenX: 0,
-      initialScreenY: 0
+      tile_size: 512,
+      initial_screen_x: 0,
+      initial_screen_y: 0
     };
   },
 
   getInitialState: function () {
     return {
       style: {
-        height: this.props.tileSize,
-        width: this.props.tileSize,
-        left: this.props.initialScreenX,
-        top:  this.props.initialScreenY
+        height: this.props.tile_size,
+        width: this.props.tile_size,
+        left: this.props.initial_screen_x,
+        top:  this.props.initial_screen_y
       }
     };
   },
@@ -30,11 +29,25 @@ global.CanvasTile = React.createClass({
     return (
       <div className="canvas-tile" style={this.state.style}>
         <span>{this.props.hash}</span>
-        <canvas width={this.props.tileSize}
-                height={this.props.tileSize}/>
+        <canvas width={this.props.tile_size}
+                height={this.props.tile_size}/>
       </div>
     );
-  },
-
-  intersectsWindow: function () {}
+  }
 });
+
+var CanvasTile = module.exports;
+
+CanvasTile.safeRender = function (props) {
+  /*jshint white:false*/
+  var canvas_tile =
+    <CanvasTile
+      hash={props.hash}
+      bounds={props.bounds}
+      scroll={props.scroll}
+      tile_size={props.tileSize}
+      initial_screen_x={props.initialScreenX}
+      initial_screen_y={props.initialScreenY}/>;
+
+  return React.renderComponent(canvas_tile, props && props.parent);
+};

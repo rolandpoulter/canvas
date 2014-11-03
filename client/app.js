@@ -33,5 +33,9 @@ function initApp() {
 
   require('./ui/canvas_view.jsx').safeRender({
     parent: global.document.body,
+    initialX: 0,
+    initialY: 0,
+    initialScale: 1,
+    tileOptions: {}
   });
 }

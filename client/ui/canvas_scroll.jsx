@@ -17,11 +17,18 @@ global.CanvasScroll = React.createClass({
 
   getInitialState: function () {
     this.tiles = new Tiles(this.props.tile_options);
+
     this.updateTileView();
+
     this.state = {
-      styles: {},
+      style: {
+        transform: 'translate(' +
+          this.props.view.state.position.x + ',' +
+          this.props.view.state.position.y + ')'
+      },
       tiles: this.tiles.view
     };
+
     return this.state;
   },
 
@@ -31,33 +38,33 @@ global.CanvasScroll = React.createClass({
 
   updateViewState: function () {
     this.updateTileView();
+
     var state = {
       tiles: this.tiles.view
     };
-    // console.log(this.tiles);
+
     this.setState(state);
   },
 
   updateTileView: function () {
+    var tileSize = 256, scale = 1;
+
     var bounds = this.props.view.screenBounds;
-    bounds = this.props.view.worldBounds;
-    console.log('view bounds', bounds);
-    this.tiles.resetView(bounds, 256, 1, function (cell) {
+
+    this.tiles.resetView(bounds, tileSize, scale, function (cell) {
       /*jshint white:false*/
       if (!cell.ref) {
-        var point = new Point(cell.left, cell.top).toScreenSpace(0, 0 ,1);
         cell.setRef(<CanvasTile
           hash={cell.hash}
           bounds={cell}
           scroll={this}
-          tileSize={256}
-          initialScreenX={point.x}
-          initialScreenY={point.y}/>);
+          tile_size={tileSize}
+          initial_screen_x={cell.left}
+          initial_screen_y={cell.top}/>);
       }
+
       return cell;
     }.bind(this));
-    // this.tiles.cullView(bounds);
-    // console.log(this.tiles);
   },
 
   componentDidMount: function () {
@@ -75,11 +82,24 @@ global.CanvasScroll = React.createClass({
       this.state.tiles.map(function (rect) {
         return rect.ref;
       });
+
     /*jshint white:false*/
     return (
-      <div className="canvas-scroll" style={this.state.styles}>
+      <div className="canvas-scroll" style={this.state.style}>
         {tiles}
       </div>
     );
   }
 });
+
+var CanvasScroll = module.exports;
+
+CanvasScroll.safeRender = function (props) {
+  /*jshint white:false*/
+  var canvas_scroll =
+    <CanvasScroll
+      view={props.view}
+      tile_options={props.tileOptions}/>;
+
+  return React.renderComponent(canvas_scroll, props && props.parent);
+};

@@ -9,66 +9,78 @@ function Point(x, y) {
   this.y = y || 0; // y-axis coordinate
 }
 
-Point.prototype.toScreenSpace = function (viewX, viewY, viewScale) {
-  viewX = viewX || 0;
-  viewY = viewY || 0;
+// http://stackoverflow.com/questions/14880601/translating-between-cartesian-and-screen-coordinates
+
+Point.prototype.toScreenSpace = function (viewScale) {
   viewScale = viewScale || 1;
-  var w = window.innerWidth,
-      h = window.innerHeight,
-      W = w / 2 + (viewX * viewScale),
-      H = h / 2 + (viewY * viewScale);
-  return new Point(
-    (this.x * viewScale) + W,
-    (this.y * viewScale) + H);
+
+  var screenWidth  = window.innerWidth,
+      screenHeight = window.innerHeight,
+      screenX =  (this.x + screenWidth  / 2) / viewScale,
+      screenY = (-this.y + screenHeight / 2) / viewScale;
+
+  return new Point(screenX, screenY);
 };
 
-Point.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
-  viewX = viewX || 0;
-  viewY = viewY || 0;
+Point.prototype.toWorldSpace = function (viewScale) {
   viewScale = viewScale || 1;
-  var w = window.innerWidth,
-      h = window.innerHeight,
-      W = w / 2 + (viewX / viewScale),
-      H = h / 2 + (viewY / viewScale);
-  return new Point(
-    (this.x / viewScale) - W,
-    (this.y / viewScale) - H);
+
+  var screenWidth  = window.innerWidth,
+      screenHeight = window.innerHeight,
+      cartesianX =  viewScale * this.x - screenWidth  / 2,
+      cartesianY = -viewScale * this.y + screenHeight / 2;
+
+  return new Point(cartesianX, cartesianY);
+};
+
+Point.prototype.toScreenRect = function (viewScale, width, height) {
+  viewScale = viewScale || 1;
+
+  width =  (width  || window.innerWidth)  * viewScale;
+  height = (height || window.innerHeight) * viewScale;
+
+  var x = this.x * viewScale,
+      y = this.y * viewScale;
+
+  return new global.Rect(
+    x,         y,
+    x + width, y + height);
 };
 
 Point.prototype.toRectFromCenter = function (width, height) {
   width = width || 1;
   height = height || width;
+
   var w = width / 2,
       h = height / 2;
+
   return new global.Rect(
-    this.x - w,
-    this.y + h,
-    this.x + w,
-    this.y - h);
+    this.x - w, this.y + h,
+    this.x + w, this.y - h);
 };
 
 Point.prototype.toRectFromTopLeft = function (width, height) {
   width = width || 1;
   height = height || width;
+
   return new global.Rect(
-    this.x,
-    this.y,
-    this.x + width,
-    this.y - height);
+    this.x,         this.y,
+    this.x + width, this.y - height);
 };
 
 Point.prototype.toRectFromBottomRight = function (width, height) {
   width = width || 1;
   height = height || width;
+
   return new global.Rect(
-    this.x - width,
-    this.y + height,
-    this.x,
-    this.y);
+    this.x - width, this.y + height,
+    this.x,         this.y);
 };
 
 Point.prototype.translate = function (x, y) {
+  x = x || 0;
   if (y === undefined) y = x;
+
   this.x += x;
   this.y += y;
 };
