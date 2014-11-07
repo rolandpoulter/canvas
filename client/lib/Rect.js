@@ -60,6 +60,26 @@ Rect.prototype.toWorldSpace = function (viewX, viewY, viewScale) {
   return new Rect(a.x, a.y, b.x, b.y);
 };
 
+Rect.prototype.toTileSpace = function (tileSize) {
+  var a = new global.Point(this.left, this.top),
+      b = new global.Point(this.right, this.bottom);
+
+  a = a.toTileSpace(tileSize);
+  b = b.toTileSpace(tileSize);
+
+  return new Rect(a.x, a.y, b.x, b.y);
+};
+
+Rect.prototype.fromTileSpace = function (tileSize) {
+  var a = new global.Point(this.left, this.top),
+      b = new global.Point(this.right, this.bottom);
+
+  a = a.fromTileSpace(tileSize);
+  b = b.fromTileSpace(tileSize);
+
+  return new Rect(a.x, a.y, b.x, b.y);
+};
+
 Rect.prototype.isSquare = function () {
   return this.getWidth() === this.getHeight();
 };
@@ -129,22 +149,110 @@ Rect.prototype.containsRect = function (rect) {
          this.bottom < rect.bottom;
 };
 
-Rect.prototype.scale = function (x, y) {
-  x = x || 1;
-  y = y || x;
+Rect.prototype.floor = function () {
+  return new Rect(
+    Math.floor(this.left),
+    Math.floor(this.top),
+    Math.floor(this.right),
+    Math.floor(this.bottom),
+    this.ref);
+};
 
-  this.left *= x;
-  this.right *= x;
-  this.top *= y;
-  this.bottom *= y;
+Rect.prototype.ceil = function () {
+  return new Rect(
+    Math.ceil(this.left),
+    Math.ceil(this.top),
+    Math.ceil(this.right),
+    Math.ceil(this.bottom),
+    this.ref);
+};
+
+Rect.prototype.round = function () {
+  return new Rect(
+    Math.round(this.left),
+    Math.round(this.top),
+    Math.round(this.right),
+    Math.round(this.bottom),
+    this.ref);
+};
+
+Rect.prototype.abs = function () {
+  return new Rect(
+    Math.abs(this.left),
+    Math.abs(this.top),
+    Math.abs(this.right),
+    Math.abs(this.bottom),
+    this.ref);
+};
+
+Rect.prototype.sqrt = function () {
+  return new Rect(
+    Math.sqrt(this.left),
+    Math.sqrt(this.top),
+    Math.sqrt(this.right),
+    Math.sqrt(this.bottom),
+    this.ref);
+};
+
+Rect.prototype.copy = function () {
+  return new Rect(
+    Math.sqrt(this.left),
+    Math.sqrt(this.top),
+    Math.sqrt(this.right),
+    Math.sqrt(this.bottom),
+    this.ref);
 };
 
 Rect.prototype.translate = function (x, y) {
   x = x || 0;
-  y = y || 0;
-
+  if (y === undefined) y = x;
   this.left += x;
   this.right += x;
   this.top += y;
   this.bottom += y;
+  return this;
+};
+
+Rect.prototype.add = Rect.prototype.translate;
+
+Rect.prototype.subtract = function (x, y) {
+  x = x || 0;
+  if (y === undefined) y = x;
+  this.left -= x;
+  this.right -= x;
+  this.top -= y;
+  this.bottom -= y;
+  return this;
+};
+
+Rect.prototype.scale = function (x, y) {
+  x = x || 1;
+  if (y === undefined) y = x;
+  this.left *= x;
+  this.right *= x;
+  this.top *= y;
+  this.bottom *= y;
+  return this;
+};
+
+Rect.prototype.multiply = Rect.prototype.scale;
+
+Rect.prototype.divide = function (x, y) {
+  x = x || 1;
+  if (y === undefined) y = x;
+  this.left /= x;
+  this.right /= x;
+  this.top /= y;
+  this.bottom /= y;
+  return this;
+};
+
+Rect.prototype.modulus = function (x, y) {
+  x = x || 1;
+  if (y === undefined) y = x;
+  this.left %= x;
+  this.right %= x;
+  this.top %= y;
+  this.bottom %= y;
+  return this;
 };

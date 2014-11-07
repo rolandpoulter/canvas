@@ -23,8 +23,8 @@ global.CanvasView = React.createClass({
       scale: this.props.initial_scale,
       style: {
         transform: 'translate(' +
-          this.props.initial_x + ',' +
-          this.props.initial_y + ')'
+          this.props.initial_x + 'px,' +
+          this.props.initial_y + 'px)'
       },
       position: new Point(this.props.initial_x, this.props.initial_y)
     };
@@ -84,7 +84,10 @@ global.CanvasView = React.createClass({
         this.updateBounds();
         this.updateTransform();
 
-        if (this.scroll) this.scroll.updateViewState();
+        if (this.scroll) {
+          this.scroll.updateViewState();
+          this.scroll.forceUpdate();
+        }
 
         // Allow another move to queue.
         delete this.mouseMoveFrameWaiting;
@@ -135,12 +138,13 @@ global.CanvasView = React.createClass({
   render: function () {
     /*jshint white:false*/
     return (
-      <div className="canvas-view" style={this.state.style}
+      <div className="canvas-view"
+           style={this.state.style}
            onMouseDown={this.handleMouseDown}
            onMouseMove={this.handleMouseMove}
            onMouseUp={this.handleMouseUp}>
         <div className="position">
-          {this.state.position.x},&nbsp;{this.state.position.y}
+          {this.state.position.x},{this.state.position.y}
         </div>
         <CanvasOverlay/>
         <CanvasScroll view={this}

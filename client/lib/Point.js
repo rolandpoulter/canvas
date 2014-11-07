@@ -33,6 +33,18 @@ Point.prototype.toWorldSpace = function (viewScale) {
   return new Point(cartesianX, cartesianY);
 };
 
+Point.prototype.toTileSpace = function (tileSize) {
+  return new Point(
+    this.x / tileSize,
+    this.y / tileSize);
+};
+
+Point.prototype.fromTileSpace = function (tileSize) {
+  return new Point(
+    this.x * tileSize,
+    this.y * tileSize);
+};
+
 Point.prototype.toScreenRect = function (viewScale, width, height) {
   viewScale = viewScale || 1;
 
@@ -77,12 +89,78 @@ Point.prototype.toRectFromBottomRight = function (width, height) {
     this.x,         this.y);
 };
 
+Point.prototype.distanceTo = function (point) {
+  var x = point.x - this.x,
+      y = point.y - this.y;
+  return Math.sqrt(x * x + y * y);
+};
+
+Point.prototype.floor = function () {
+  return new Point(Math.floor(this.x), Math.floor(this.y));
+};
+
+Point.prototype.ceil = function () {
+  return new Point(Math.ceil(this.x), Math.ceil(this.y));
+};
+
+Point.prototype.round = function () {
+  return new Point(Math.round(this.x), Math.round(this.y));
+};
+
+Point.prototype.abs = function () {
+  return new Point(Math.abs(this.x), Math.abs(this.y));
+};
+
+Point.prototype.sqrt = function () {
+  return new Point(Math.sqrt(this.x), Math.sqrt(this.y));
+};
+
+Point.prototype.copy = function () {
+  return new Point(this.x, this.y);
+};
+
 Point.prototype.translate = function (x, y) {
   x = x || 0;
   if (y === undefined) y = x;
-
   this.x += x;
   this.y += y;
+  return this;
+};
+
+Point.prototype.add = Point.prototype.translate;
+
+Point.prototype.subtract = function (x, y) {
+  x = x || 0;
+  if (y === undefined) y = x;
+  this.x -= x;
+  this.y -= y;
+  return this;
+};
+
+Point.prototype.scale = function (x, y) {
+  x = x || 1;
+  if (y === undefined) y = x;
+  this.x *= x;
+  this.y *= y;
+  return this;
+};
+
+Point.prototype.multiply = Point.prototype.scale;
+
+Point.prototype.divide = function (x, y) {
+  x = x || 1;
+  if (y === undefined) y = x;
+  this.x /= x;
+  this.y /= y;
+  return this;
+};
+
+Point.prototype.modulus = function (x, y) {
+  x = x || 1;
+  if (y === undefined) y = x;
+  this.x %= x;
+  this.y %= y;
+  return this;
 };
 
 // var a = new Point(0, 0).toRectFromCenter(10, 10),

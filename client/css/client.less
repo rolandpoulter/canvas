@@ -7,29 +7,32 @@ html, body {
 }
 
 body {
-  background: #333;
+  background: #334;
+  color: #dfd;
 }
 
 .canvas-view, .canvas-scroll, .canvas-tile {
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 
   -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
-.canvas-view, .canvas-scroll {
+.canvas-view {
   width: 100%;
   height: 100%;
 }
 
+.canvas-scroll {}
+
 .canvas-view .position {
-  color: white;
+  display: none;
 }
 
 .canvas-view {}
@@ -39,13 +42,12 @@ body {
 }
 
 .canvas-tile {
-  border: 1px solid #888;
-  border-color: rgba(0.5, 0.5, 0.5, 0.5);
-  border-collapse: collapse;
   position: absolute;
+
+  border-left: 1px dotted #686;
+   border-top: 1px dotted #686;
 }
 
 .canvas-tile .hash {
-  opacity: 0.5;
-  // display: none;
+  display: none;
 }

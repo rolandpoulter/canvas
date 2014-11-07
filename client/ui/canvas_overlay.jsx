@@ -16,7 +16,8 @@ global.CanvasOverlay = React.createClass({
   render: function () {
     /*jshint white:false*/
     return (
-      <div className="canvas-overlay" style={this.state.style}></div>
+      <div className="canvas-overlay"
+           style={this.state.style}></div>
     );
   }
 });

@@ -39,7 +39,10 @@ function Tiles(options) {/*jshint maxcomplexity:11*/
 
   this.spatialHash = new global.SpatialHash(
     options.powerOfTwo || 128);
+
+  this.grid = new global.Grid(this);
 }
+
 
 Tiles.prototype.indexOf = function (rect, fromCollection) {
   if (this.collection && fromCollection) return this.collection.indexOf(rect);
@@ -95,33 +98,8 @@ Tiles.prototype.clear = function () {
   this.spatialHash.clear();
 };
 
-Tiles.prototype.scaleToDepth = function (scale) {
-  return 2 * scale;
-};
 
-Tiles.prototype.depthToScale = function (depth) {
-  return 0.5 * depth;
-};
-
-Tiles.prototype.getNearestQuadtree = function (rect, scale) {
-  scale = scale || 1;
-
-  var node = this.quadtree,
-      last,
-      index;
-
-  while (true) {
-    if (!node) return last;
-    if (rect.containsRect(node.rect)) return last;
-    if (!node.nodes[0]) node.split();
-
-    last = node;
-    index = node.getIndex(rect);
-    node = node.nodes[index];
-  }
-};
-
-Tiles.prototype.resetView = function (viewRect, tileSize, scale, iterator) {
+Tiles.prototype.reset = function (viewRect, tileSize, scale, iterator) {
   if (this.view) {
     this.view.forEach(function (cell) {
       if (cell.release) cell.release();
@@ -131,23 +109,19 @@ Tiles.prototype.resetView = function (viewRect, tileSize, scale, iterator) {
   this.view = [];
   this.clear();
 
-  return this.fillView(viewRect, tileSize, scale, iterator);
+  return this.update(viewRect, tileSize, scale, iterator);
 };
 
-Tiles.prototype.fillView = function (viewRect, tileSize, scale, iterator) {
+Tiles.prototype.update = function (viewRect, tileSize, scale, iterator) {
   scale = scale || 1;
   this.view = this.view || [];
 
-  var nearestQuadtree = this.getNearestQuadtree(viewRect, scale),
-      quadrantRect = nearestQuadtree.rect,
-      grid = new global.Grid(viewRect, quadrantRect, tileSize, scale);
-
-  grid.generate(function (cell) {
-    cell = cell.cache();
+  this.grid.draw(viewRect, tileSize, scale, function (cell) {
+    // cell = cell.cache();
 
     if (iterator) cell = iterator(cell) || cell;
 
-    this.insert(cell);
+    // this.insert(cell);
     this.view.push(cell);
 
     return cell;
@@ -156,24 +130,24 @@ Tiles.prototype.fillView = function (viewRect, tileSize, scale, iterator) {
   return this.view;
 };
 
-Tiles.prototype.cullView = function (viewRect) {
-  var visible = [],
-      culled = [];
-
-  this.view.forEach(function (cell) {
-    var intersects = cell.intersectsRect(viewRect);
-
-    if (intersects) visible.push(cell);
-
-    else {
-      if (cell.release) cell.release();
-
-      this.remove(cell);
-      culled.push(cell);
-    }
-  }.bind(this));
-
-  this.view = visible;
-
-  return culled;
-};
+// Tiles.prototype.cull = function (viewRect) {
+//   var visible = [],
+//       culled = [];
+//
+//   this.view.forEach(function (cell) {
+//     var intersects = cell.intersectsRect(viewRect);
+//
+//     if (intersects) visible.push(cell);
+//
+//     else {
+//       if (cell.release) cell.release();
+//
+//       this.remove(cell);
+//       culled.push(cell);
+//     }
+//   }.bind(this));
+//
+//   this.view = visible;
+//
+//   return culled;
+// };

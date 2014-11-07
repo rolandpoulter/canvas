@@ -207,3 +207,20 @@ Quadtree.prototype.clear = function () {
       this.nodes[i] = null;
     }
 };
+
+
+Quadtree.prototype.getNearestQuadtree = function (rect) {
+  var node = this.quadtree,
+      last,
+      index;
+
+  while (true) {
+    if (!node) return last;
+    if (rect.containsRect(node.rect)) return last;
+    if (!node.nodes[0]) node.split();
+
+    last = node;
+    index = node.getIndex(rect);
+    node = node.nodes[index];
+  }
+};
