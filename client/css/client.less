@@ -19,9 +19,9 @@ body {
         -ms-user-select: none;
             user-select: none;
 
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+  // -webkit-box-sizing: border-box;
+  //    -moz-box-sizing: border-box;
+  //         box-sizing: border-box;
 }
 
 .canvas-view {
@@ -42,10 +42,12 @@ body {
 }
 
 .canvas-tile {
+  background: transparent;
   position: absolute;
 
-  border-left: 1px dotted #686;
-   border-top: 1px dotted #686;
+  border: 1px dashed #686;
+  // border-left: 1px dotted #686;
+  //  border-top: 1px dotted #686;
 }
 
 .canvas-tile .hash {

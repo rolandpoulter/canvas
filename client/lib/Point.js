@@ -162,13 +162,3 @@ Point.prototype.modulus = function (x, y) {
   this.y %= y;
   return this;
 };
-
-// var a = new Point(0, 0).toRectFromCenter(10, 10),
-//     b = new Point(0, 0).toRectFromCenter(5, 5),
-//     c = new Point(0, 0).toRectFromTopLeft(5, 5),
-//     d = new Point(0, 0).toRectFromBottomRight(5, 5);
-//
-// console.log('ab', a.intersectsRect(b));
-// console.log('ac', a.intersectsRect(c));
-// console.log('ad', a.intersectsRect(d));
-// console.log('bd', b.intersectsRect(d));

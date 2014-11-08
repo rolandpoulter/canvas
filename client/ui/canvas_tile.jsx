@@ -26,7 +26,6 @@ global.CanvasTile = React.createClass({
 
   render: function () {
     /*jshint white:false*/
-    // console.log('tile', this.state.style.left, this.state.style.top);
     return (
       <div className="canvas-tile"
            style={this.state.style}>

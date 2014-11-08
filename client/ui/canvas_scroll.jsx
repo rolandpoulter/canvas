@@ -18,10 +18,8 @@ global.CanvasScroll = React.createClass({
   getInitialState: function () {
     this.tiles = new Tiles(this.props.tile_options);
 
-    this.updateTileView();
-
     this.state = {
-      tiles: this.tiles.view
+      tiles: this.updateTileView()
     };
 
     return this.state;
@@ -32,10 +30,8 @@ global.CanvasScroll = React.createClass({
   },
 
   updateViewState: function () {
-    this.updateTileView();
-
     var state = {
-      tiles: this.tiles.view
+      tiles: this.updateTileView()
     };
 
     this.setState(state);
@@ -46,14 +42,14 @@ global.CanvasScroll = React.createClass({
         tileSize = 256,
         scale = 1;
 
-    // console.log('RESET', bounds);
+    this.tiles.setViewBounds(bounds, tileSize, scale);
 
-    this.tiles.reset(bounds, tileSize, scale, function (cell) {
+    return this.tiles.update(function (cell, action) {
       /*jshint white:false*/
-      if (!cell.ref) {
+      if (action === 'new' && !cell.ref) {
         cell.setRef(<CanvasTile
-          // key={cell.key}
-          hash={cell.hash}
+          key={cell.key}
+          hash={cell.key}
           bounds={cell}
           scroll={this}
           tile_size={tileSize}
@@ -61,16 +57,8 @@ global.CanvasScroll = React.createClass({
           initial_screen_y={cell.top}/>);
       }
 
-      // console.log(cell.left, cell.top);
-
       return cell;
     }.bind(this));
-
-    // console.log('DONE', this.tiles.view.length);
-
-    this.setState({
-      tiles: this.tiles.view
-    });
   },
 
   componentDidMount: function () {
@@ -92,8 +80,6 @@ global.CanvasScroll = React.createClass({
       this.state.tiles.map(function (rect) {
         return rect.ref;
       });
-
-    // console.log('Tile count:', tiles.length);
 
     /*jshint white:false*/
     return (

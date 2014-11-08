@@ -96,58 +96,31 @@ Tiles.prototype.clear = function () {
 
   this.quadtree.clear();
   this.spatialHash.clear();
+
+  this.grid.clear();
 };
 
+Tiles.prototype.setViewBounds = function (worldBounds, size, scale) {
+  this.grid.setViewBounds(worldBounds, size, scale);
+};
 
 Tiles.prototype.reset = function (viewRect, tileSize, scale, iterator) {
-  if (this.view) {
-    this.view.forEach(function (cell) {
-      if (cell.release) cell.release();
-    }.bind(this));
-  }
-
-  this.view = [];
+  // console.log('reset tiles');
   this.clear();
 
   return this.update(viewRect, tileSize, scale, iterator);
 };
 
 Tiles.prototype.update = function (viewRect, tileSize, scale, iterator) {
-  scale = scale || 1;
-  this.view = this.view || [];
+  return this.grid.draw(viewRect, tileSize, scale, function (cell, action) {
+    if (iterator) cell = iterator(cell, action) || cell;
 
-  this.grid.draw(viewRect, tileSize, scale, function (cell) {
-    // cell = cell.cache();
-
-    if (iterator) cell = iterator(cell) || cell;
-
-    // this.insert(cell);
-    this.view.push(cell);
+    if (action === 'new') this.insert(cell);
 
     return cell;
   }.bind(this));
-
-  return this.view;
 };
 
 // Tiles.prototype.cull = function (viewRect) {
-//   var visible = [],
-//       culled = [];
-//
-//   this.view.forEach(function (cell) {
-//     var intersects = cell.intersectsRect(viewRect);
-//
-//     if (intersects) visible.push(cell);
-//
-//     else {
-//       if (cell.release) cell.release();
-//
-//       this.remove(cell);
-//       culled.push(cell);
-//     }
-//   }.bind(this));
-//
-//   this.view = visible;
-//
-//   return culled;
+  // TODO:
 // };

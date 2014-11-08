@@ -84,9 +84,14 @@ global.CanvasView = React.createClass({
         this.updateBounds();
         this.updateTransform();
 
-        if (this.scroll) {
-          this.scroll.updateViewState();
-          this.scroll.forceUpdate();
+        if (this.scroll && !this.updateScrollWaiting) {
+          this.updateScrollWaiting = true;
+
+          window.requestAnimationFrame(function () {
+            this.scroll.updateViewState();
+
+            delete this.updateScrollWaiting;
+          }.bind(this));
         }
 
         // Allow another move to queue.
@@ -106,7 +111,7 @@ global.CanvasView = React.createClass({
   getScreenBounds: function () {
     var p = this.state.position;
 
-    return new Point(p.x, p.y)
+    return new Point(-p.x, -p.y)
       .toScreenRect(
         this.state.scale,
         window.innerWidth,

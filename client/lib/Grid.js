@@ -11,6 +11,7 @@ module.exports = global.Grid = Grid;
 function Grid(manager, buffer) {
   this.manager = manager;
   this.buffer = buffer || 0.5;
+  this.clear();
 }
 
 Grid.prototype.scaleToDepth = function (scale) {
@@ -46,28 +47,59 @@ Grid.prototype.checkCoords = function () {
   return true;
 };
 
-Grid.prototype.draw = function (worldBounds, size, scale, iterator) {
-  /*jshint maxstatements:30, maxcomplexity:13*/
-  this.viewBounds = worldBounds;
-  this.size = typeof size === 'number' ? size : 256;
-  this.scale = typeof scale === 'number' ? scale : 1;
-  this.depth = this.scaleToDepth(this.scale);
-  this.tileBounds = this.viewBounds.toTileSpace(this.size);
+Grid.prototype.clear = function () {
+  if (this.current) {
+    this.current.forEach(function (cell) {
+      if (cell.release) cell.release();
+      if (cell.ref && cell.ref.release) cell.ref.release();
+      this.manager.remove(cell, true);
+    }.bind(this));
+  }
 
-  this.current = this.current || [];
-  this.queue = this.queue || [];
-  this.cache = this.cache || {};
+  this.current = [];
+  this.queue = [];
+  this.cache = {};
+  this.length = 0;
+  this.cols = 0;
+  this.rows = 0;
+};
 
-  iterator = (
-    typeof size === 'function' ? size :
-    typeof scale === 'function' ? scale :
-  iterator) || function (cell) {
+Grid.prototype.setViewBounds = function (worldBounds, size, scale) {
+  /*jshint maxstatements:15*/
+  var update = false;
+
+  if (typeof worldBounds === 'object') {
+    this.viewBounds = worldBounds;
+    update = true;
+  }
+
+  if (typeof size === 'number') {
+    this.size = size;
+    update = true;
+  }
+
+  if (typeof scale === 'number') {
+    this.scale = scale;
+    update = true;
+  }
+
+  if (update) {
+    this.depth = this.scaleToDepth(this.scale);
+    this.tileBounds = this.viewBounds.toTileSpace(this.size);
+  }
+
+  return this;
+};
+
+Grid.prototype.draw = function (iterator) {
+  /*jshint maxstatements:20, maxcomplexity:10*/
+  iterator = iterator || function (cell) {
     return cell;
   };
 
   var coords = null,
       range = this.tileBounds,
-      b = this.buffer + 1,
+      b = this.buffer + 0.5,
       y = Math.ceil(range.bottom - b), Y = Math.ceil(range.top   + b),
       x = Math.ceil(range.left   - b), X = Math.ceil(range.right + b),
       c = x;
@@ -75,15 +107,16 @@ Grid.prototype.draw = function (worldBounds, size, scale, iterator) {
   this.cols = X - x;
   this.rows = Y - y;
 
+  // console.log('x range', x, X);
+  // console.log('y range', y, Y);
+
   for (; y < Y; y += 1) {
     x = c;
     for (; x < X; x += 1) {
-      console.log('coords', x, y);
       coords = new global.Point(x, y);
       coords.depth = this.depth;
       coords.size = this.size;
       coords.key = this.keyOf(coords);
-      // console.log('GOT HERE', coords);
       if (!this.cache[coords.key] && this.checkCoords(coords)) {
         this.queue.push(coords);
       }
@@ -97,46 +130,56 @@ Grid.prototype.draw = function (worldBounds, size, scale, iterator) {
 
   if (this.queue.length === 0) return;
 
-  this.current = this.current.filter(function (cell) {
-    var intersects = cell.intersectsRect(this.viewBounds);
-    console.log(intersects);
-    // if (!intersects) {
-    //   if (cell.release) cell.release();
-    //   if (cell.ref && cell.ref.release) cell.ref.release();
-    //   this.manager.remove(cell, true);
-    //   return true;
-    // }
-  }.bind(this));
-
   this.queue = this.queue.filter(function (coords) {
-    var cell;
+    var cell, action;
+
+    // console.log(coords.key);
     if (this.cache[coords.key]) {
+      // console.log('update tile');
       cell = this.cache[coords.key];
+      action = 'update';
     }
+
     else {
+      // console.log('new tile');
+      action = 'new';
       cell = coords.fromTileSpace(coords.size);
-      // console.log('cell a', cell.x, cell.y);
       cell = cell.toScreenSpace();
-      // console.log('cell b', cell.x, cell.y);
-      // console.log(cell);
       cell = cell.toRectFromTopLeft(coords.size);
-      // console.log('cell', cell);
       cell.col = coords.x;
       cell.row = coords.y;
       cell.key = coords.key;
       cell.size = coords.size;
       cell.depth = coords.depth;
     }
-    console.log(coords.key);
-    cell = iterator(cell) || cell;
-    // console.log(cell);
+
+    cell = iterator(cell, action) || cell;
+    this.cache[coords.key] = cell;
+
     this.current.push(cell);
+
     return true;
   }.bind(this));
 
+  // this.cull();
+
   this.length = this.current.length;
 
-  console.log(this);
+  return this.current;
+};
+
+Grid.prototype.cull = function (worldBounds) {
+  this.setViewBounds(worldBounds);
+
+  this.current = this.current.filter(function (cell) {
+    var intersects = cell.intersectsRect(this.viewBounds);
+    if (!intersects) {
+      if (cell.release) cell.release();
+      if (cell.ref && cell.ref.release) cell.ref.release();
+      this.manager.remove(cell, true);
+      return true;
+    }
+  }.bind(this));
 
   return this.current;
 };
