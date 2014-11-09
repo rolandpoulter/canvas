@@ -4,31 +4,12 @@ require('./Point.js');
 
 module.exports = global.Rect = Rect;
 
-Rect.cache = {};
-
-function Rect(left, top, right, bottom, ref) {
+function Rect(left, top, right, bottom) {
   this.left = left;
   this.top = top;
   this.right = right;
   this.bottom = bottom;
-  this.ref = ref || null;
 }
-
-Rect.fromCache = function (hash) {
-  return Rect.cache[hash];
-};
-
-Rect.prototype.cache = function () {
-  var hash = [this.left, this.top, this.right, this.bottom].join(':'),
-      existing = Rect.fromCache(hash);
-
-  if (existing) return existing;
-
-  this.hash = hash;
-  Rect.cache[hash] = this;
-
-  return this;
-};
 
 Rect.prototype.release = function () {
   if (this.hash) {

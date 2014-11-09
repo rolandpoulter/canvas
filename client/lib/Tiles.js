@@ -105,7 +105,6 @@ Tiles.prototype.setViewBounds = function (worldBounds, size, scale) {
 };
 
 Tiles.prototype.reset = function (viewRect, tileSize, scale, iterator) {
-  // console.log('reset tiles');
   this.clear();
 
   return this.update(viewRect, tileSize, scale, iterator);
@@ -121,6 +120,6 @@ Tiles.prototype.update = function (viewRect, tileSize, scale, iterator) {
   }.bind(this));
 };
 
-// Tiles.prototype.cull = function (viewRect) {
-  // TODO:
-// };
+Tiles.prototype.cull = function (viewRect) {
+  return this.grid.cull(viewRect);
+};

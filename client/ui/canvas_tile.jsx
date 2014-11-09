@@ -24,6 +24,10 @@ global.CanvasTile = React.createClass({
     };
   },
 
+  shouldComponentUpdate: function () {
+    return false;
+  },
+
   render: function () {
     /*jshint white:false*/
     return (

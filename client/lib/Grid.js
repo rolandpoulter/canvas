@@ -8,9 +8,9 @@ module.exports = global.Grid = Grid;
 
 // Based on leaflet GridLayer
 
-function Grid(manager, buffer) {
+function Grid(manager) {
   this.manager = manager;
-  this.buffer = buffer || 0.5;
+
   this.clear();
 }
 
@@ -92,26 +92,40 @@ Grid.prototype.setViewBounds = function (worldBounds, size, scale) {
 };
 
 Grid.prototype.draw = function (iterator) {
-  /*jshint maxstatements:20, maxcomplexity:10*/
+  /*jshint maxstatements:35, maxcomplexity:12*/
   iterator = iterator || function (cell) {
     return cell;
   };
 
   var coords = null,
       range = this.tileBounds,
-      b = this.buffer + 0.5,
-      y = Math.ceil(range.bottom - b), Y = Math.ceil(range.top   + b),
-      x = Math.ceil(range.left   - b), X = Math.ceil(range.right + b),
-      c = x;
+      x = range.left,   X = range.right,
+      y = range.bottom, Y = range.top,
+      r = x;
+
+  if (x > X) { x = range.right; X = range.left; }
+  if (y > Y) { y = range.top;   Y = range.bottom; }
+
+  x = Math.abs(x) === x ? Math.ceil(x) :  Math.floor(x);
+  X = Math.abs(X) === X ? Math.ceil(X) :  Math.floor(X);
+
+  y = Math.abs(y) === y ? Math.ceil(y) :  Math.floor(y);
+  Y = Math.abs(Y) === Y ? Math.ceil(Y) :  Math.floor(Y);
+
+  r = x;
+
+  // offset hacks
+  x -= 1;
+  X += 1;
+  // y += 1;
+  // Y += 1;
+  Y += 2;
 
   this.cols = X - x;
   this.rows = Y - y;
 
-  // console.log('x range', x, X);
-  // console.log('y range', y, Y);
-
   for (; y < Y; y += 1) {
-    x = c;
+    x = r;
     for (; x < X; x += 1) {
       coords = new global.Point(x, y);
       coords.depth = this.depth;
@@ -133,15 +147,12 @@ Grid.prototype.draw = function (iterator) {
   this.queue = this.queue.filter(function (coords) {
     var cell, action;
 
-    // console.log(coords.key);
     if (this.cache[coords.key]) {
-      // console.log('update tile');
-      cell = this.cache[coords.key];
       action = 'update';
+      cell = this.cache[coords.key];
     }
 
     else {
-      // console.log('new tile');
       action = 'new';
       cell = coords.fromTileSpace(coords.size);
       cell = cell.toScreenSpace();
@@ -154,9 +165,11 @@ Grid.prototype.draw = function (iterator) {
     }
 
     cell = iterator(cell, action) || cell;
-    this.cache[coords.key] = cell;
 
-    this.current.push(cell);
+    if (action === 'new') {
+      this.cache[coords.key] = cell;
+      this.current.push(cell);
+    }
 
     return true;
   }.bind(this));
@@ -168,11 +181,13 @@ Grid.prototype.draw = function (iterator) {
   return this.current;
 };
 
-Grid.prototype.cull = function (worldBounds) {
-  this.setViewBounds(worldBounds);
+Grid.prototype.cull = function (viewBounds) {
+  this.setViewBounds(viewBounds);
+
+  viewBounds = this.viewBounds.toScreenSpace();
 
   this.current = this.current.filter(function (cell) {
-    var intersects = cell.intersectsRect(this.viewBounds);
+    var intersects = viewBounds.intersectsRect(cell);
     if (!intersects) {
       if (cell.release) cell.release();
       if (cell.ref && cell.ref.release) cell.ref.release();

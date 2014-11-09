@@ -18,6 +18,10 @@ global.CanvasScroll = React.createClass({
   getInitialState: function () {
     this.tiles = new Tiles(this.props.tile_options);
 
+    this.resetInterval = setInterval(function () {
+      this.tiles.reset(this.renderTile);
+    }.bind(this), 10000);
+
     this.state = {
       tiles: this.updateTileView()
     };
@@ -37,28 +41,32 @@ global.CanvasScroll = React.createClass({
     this.setState(state);
   },
 
+  renderTile: function (cell, action) {
+    /*jshint white:false*/
+    if (action === 'new' && !cell.ref) {
+      cell.setRef(<CanvasTile
+        key={cell.key}
+        hash={cell.key}
+        bounds={cell}
+        scroll={this}
+        tile_size={this.tileSize}
+        initial_screen_x={cell.left}
+        initial_screen_y={cell.top}/>);
+    }
+
+    return cell;
+  },
+
   updateTileView: function () {
     var bounds = this.props.view.worldBounds,
-        tileSize = 256,
-        scale = 1;
+        tileSize = this.tileSize = 256,
+        scale = this.scale = 1;
 
     this.tiles.setViewBounds(bounds, tileSize, scale);
 
-    return this.tiles.update(function (cell, action) {
-      /*jshint white:false*/
-      if (action === 'new' && !cell.ref) {
-        cell.setRef(<CanvasTile
-          key={cell.key}
-          hash={cell.key}
-          bounds={cell}
-          scroll={this}
-          tile_size={tileSize}
-          initial_screen_x={cell.left}
-          initial_screen_y={cell.top}/>);
-      }
+    var tiles = this.tiles.update(this.renderTile);
 
-      return cell;
-    }.bind(this));
+    return tiles;
   },
 
   componentDidMount: function () {
@@ -67,10 +75,21 @@ global.CanvasScroll = React.createClass({
 
   componentWillUnmount: function () {
     global.removeEventListener('resize', this.handleResize);
+    clearInterval(this.resetInterval);
   },
 
   linkToView: function () {
     return (this.props.view.scroll = this);
+  },
+
+  shouldComponentUpdate: function (nextProps, nextState) {
+    var now = Date.now();
+    this.nextTileUpdateTime = this.nextTileUpdateTime || now;
+    if (nextState.tiles && this.nextTileUpdateTime <= now) {
+      this.nextTileUpdateTime = now + 32;
+      return true;
+    }
+    return false;
   },
 
   render: function () {
@@ -81,10 +100,11 @@ global.CanvasScroll = React.createClass({
         return rect.ref;
       });
 
+    // console.log(tiles.length);
+
     /*jshint white:false*/
     return (
-      <div className="canvas-scroll"
-           style={this.state.style}>
+      <div className="canvas-scroll">
         {tiles}
       </div>
     );

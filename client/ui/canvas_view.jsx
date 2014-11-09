@@ -15,6 +15,7 @@ global.CanvasView = React.createClass({
       initial_scale: 1,
       tile_options: {}
     };
+
     return state;
   },
 
@@ -35,17 +36,29 @@ global.CanvasView = React.createClass({
     return this.state;
   },
 
+  handleZoomIn: function () {
+    this.setState({scale: this.state.scale * 2});
+    this.updateBounds();
+    this.updateTransform();
+  },
+
+  handleZoomOut: function () {
+    this.setState({scale: this.state.scale / 2});
+    this.updateBounds();
+    this.updateTransform();
+  },
+
   updateBounds: function () {
     this.screenBounds = this.getScreenBounds();
     this.worldBounds = this.getWorldBounds();
   },
 
   updateTransform: function () {
+    var s = this.state.scale,
+        p = this.state.position.copy().scale(s);
     this.setState({
       style: {
-        transform: 'translate(' +
-          this.state.position.x + 'px,' +
-          this.state.position.y + 'px)'
+        transform: 'scale(' + s + ') translate(' + p.x + 'px, ' + p.y + 'px)'
       }
     });
   },
@@ -84,11 +97,11 @@ global.CanvasView = React.createClass({
         this.updateBounds();
         this.updateTransform();
 
-        if (this.scroll && !this.updateScrollWaiting) {
+        if (this.refs.scroll && !this.updateScrollWaiting) {
           this.updateScrollWaiting = true;
 
           window.requestAnimationFrame(function () {
-            this.scroll.updateViewState();
+            this.refs.scroll.updateViewState();
 
             delete this.updateScrollWaiting;
           }.bind(this));
@@ -140,20 +153,38 @@ global.CanvasView = React.createClass({
     window.removeEventListener('mouseup', this.handleMouseUp);
   },
 
+  shouldComponentUpdate: function (nextProps, nextState) {
+    if (nextState.style) return true;
+    return true;
+  },
+
   render: function () {
-    /*jshint white:false*/
+    /*jshint white:false, nonbsp:false*/
     return (
       <div className="canvas-view"
-           style={this.state.style}
            onMouseDown={this.handleMouseDown}
            onMouseMove={this.handleMouseMove}
            onMouseUp={this.handleMouseUp}>
         <div className="position">
-          {this.state.position.x},{this.state.position.y}
+          {this.state.position.x},&nbsp;
+          {this.state.position.y},&nbsp;
+          {this.state.scale}
         </div>
-        <CanvasOverlay/>
-        <CanvasScroll view={this}
-                      tile_options={this.props.tile_options}/>
+        <div className="canvas-view-transform"
+             style={this.state.style}>
+          <CanvasScroll ref="scroll"
+                        view={this}
+                        tile_options={this.props.tile_options}/>
+        </div>
+        <CanvasOverlay ref="overlay"/>
+        <div className="buttons">
+          <a href="#"
+             className="button zoom-in"
+             onClick={this.handleZoomIn}>Zoom In</a>
+          <a href="#"
+             className="button zoom-out"
+             onClick={this.handleZoomOut}>Zoom Out</a>
+        </div>
       </div>
     );
   }
