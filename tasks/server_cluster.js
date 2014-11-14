@@ -1,5 +1,7 @@
 'use strict';
 
+process.env.NODE_ENV = 'production';
+
 exports.create = startServerCluster;
 
 global.config = global.config || require('../config');

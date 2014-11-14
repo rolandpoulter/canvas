@@ -20,13 +20,14 @@ global.CanvasView = React.createClass({
   },
 
   getInitialState: function () {
+    var style = {};
+    style.transform = style['-webkit-transform'] =
+      'translate(' +
+        this.props.initial_x + '10px,' +
+        this.props.initial_y + '10px)';
     this.state = {
       scale: this.props.initial_scale,
-      style: {
-        transform: 'translate(' +
-          this.props.initial_x + 'px,' +
-          this.props.initial_y + 'px)'
-      },
+      style: style,
       position: new Point(this.props.initial_x, this.props.initial_y)
     };
 
@@ -37,15 +38,37 @@ global.CanvasView = React.createClass({
   },
 
   handleZoomIn: function () {
-    this.setState({scale: this.state.scale * 2});
-    this.updateBounds();
-    this.updateTransform();
+    // console.log(this.state);
+    // debugger;
+    this.setState({
+      scale: this.state.scale * 2,
+      position: this.state.position.scale(2)
+    });
+    setTimeout(function () {
+      // console.log(this.state);
+      // console.log(this.screenBounds);
+      // console.log(this.worldBounds);
+      this.updateBounds();
+      // console.log(this.screenBounds);
+      // console.log(this.worldBounds);
+      setTimeout(function () {
+        this.updateTransform();
+        // console.log(this.state);
+        this.updateTileScroll();
+      }.bind(this), 32);
+    }.bind(this), 32);
   },
 
   handleZoomOut: function () {
-    this.setState({scale: this.state.scale / 2});
+    this.setState({
+      scale: this.state.scale / 2,
+      position: this.state.position.divide(2)
+    });
     this.updateBounds();
-    this.updateTransform();
+    setTimeout(function () {
+      this.updateTransform();
+      this.updateTileScroll();
+    }.bind(this), 32);
   },
 
   updateBounds: function () {
@@ -55,11 +78,12 @@ global.CanvasView = React.createClass({
 
   updateTransform: function () {
     var s = this.state.scale,
-        p = this.state.position.copy().scale(s);
+        p = this.state.position;
+    var style = {};
+    style.transform = style['-webkit-transform'] =
+      'scale(' + s + ') translate(' + p.x + 'px, ' + p.y + 'px)';
     this.setState({
-      style: {
-        transform: 'scale(' + s + ') translate(' + p.x + 'px, ' + p.y + 'px)'
-      }
+      style: style
     });
   },
 
@@ -69,6 +93,46 @@ global.CanvasView = React.createClass({
 
   captureLastMousePosition: function (event) {
     this.lastMousePosition = new Point(event.screenX, event.screenY);
+  },
+
+  handleTouchStart: function (event) {
+    var touch;
+    if (!this.firstTouchId) {
+      touch = event.touches[0];
+      this.firstTouchId = touch.identifier;
+      this.handleMouseDown(touch);
+    }
+  },
+
+  handleTouchMove: function (event) {
+    event.preventDefault();
+    var touches = event.touches,
+        touch,
+        l = touches.length,
+        i = 0;
+    for (; i < l; i += 1) {
+      touch = touches[i];
+      if (touch && touch.identifier === this.firstTouchId) break;
+      touch = null;
+    }
+    if (!touch) return;
+    this.handleMouseMove(touch);
+  },
+
+  handleTouchStop: function (event) {
+    var touches = event.touches,
+        touch,
+        l = touches.length,
+        i = 0;
+    for (; i < l; i += 1) {
+      touch = touches[i];
+      if (touch && touch.identifier === this.firstTouchId) break;
+      touch = null;
+    }
+    if (!touch) {
+      delete this.firstTouchId;
+      this.handleMouseUp();
+    }
   },
 
   handleMouseDown: function (event) {
@@ -96,16 +160,7 @@ global.CanvasView = React.createClass({
 
         this.updateBounds();
         this.updateTransform();
-
-        if (this.refs.scroll && !this.updateScrollWaiting) {
-          this.updateScrollWaiting = true;
-
-          window.requestAnimationFrame(function () {
-            this.refs.scroll.updateViewState();
-
-            delete this.updateScrollWaiting;
-          }.bind(this));
-        }
+        this.updateTileScroll();
 
         // Allow another move to queue.
         delete this.mouseMoveFrameWaiting;
@@ -115,6 +170,18 @@ global.CanvasView = React.createClass({
 
   handleMouseUp: function () {
     delete this.lastMousePosition;
+  },
+
+  updateTileScroll: function () {
+    if (this.refs.scroll && !this.updateScrollWaiting) {
+      this.updateScrollWaiting = true;
+
+      window.requestAnimationFrame(function () {
+        this.refs.scroll.updateViewState();
+
+        delete this.updateScrollWaiting;
+      }.bind(this));
+    }
   },
 
   getWorldBounds: function () {
@@ -141,6 +208,9 @@ global.CanvasView = React.createClass({
 
   componentDidMount: function () {
     window.addEventListener('resize', this.handleResize);
+    window.addEventListener('touchstart', this.handleTouchStart);
+    window.addEventListener('touchmove', this.handleTouchMove);
+    window.addEventListener('touchmove', this.handleTouchStop);
     window.addEventListener('mousedown', this.handleMouseDown);
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('mouseup', this.handleMouseUp);
@@ -148,6 +218,9 @@ global.CanvasView = React.createClass({
 
   componentWillUnmount: function () {
     window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('touchstart', this.handleTouchStart);
+    window.removeEventListener('touchmove', this.handleTouchMove);
+    window.removeEventListener('touchmove', this.handleTouchStop);
     window.removeEventListener('mousedown', this.handleMouseDown);
     window.removeEventListener('mousemove', this.handleMouseMove);
     window.removeEventListener('mouseup', this.handleMouseUp);
@@ -155,13 +228,18 @@ global.CanvasView = React.createClass({
 
   shouldComponentUpdate: function (nextProps, nextState) {
     if (nextState.style) return true;
-    return true;
+    return false;
   },
 
   render: function () {
     /*jshint white:false, nonbsp:false*/
+    // console.log(this.state.style);
     return (
       <div className="canvas-view"
+           onTouchStart={this.handleTouchStart}
+           onTouchMove={this.handleTouchMove}
+           onTouchCancel={this.handleTouchStop}
+              onTouchEnd={this.handleTouchStop}
            onMouseDown={this.handleMouseDown}
            onMouseMove={this.handleMouseMove}
            onMouseUp={this.handleMouseUp}>
@@ -181,6 +259,7 @@ global.CanvasView = React.createClass({
           <a href="#"
              className="button zoom-in"
              onClick={this.handleZoomIn}>Zoom In</a>
+          &nbsp;|&nbsp;
           <a href="#"
              className="button zoom-out"
              onClick={this.handleZoomOut}>Zoom Out</a>
