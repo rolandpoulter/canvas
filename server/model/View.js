@@ -2,7 +2,9 @@
 
 // var Schema = require('jugglingdb').Schema;
 
-module.exports = app.db.mongo.schema.define('Entity', {
+module.exports = app.db.mongo.schema.define('View', {
+  // id: {type: String},
+  // _id: {type: String},
   name: {type: String, length: 255},
   // user: {type: Schema.ObjectId, index: true},
   // wall: {type: Schema.ObjectId, index: true},

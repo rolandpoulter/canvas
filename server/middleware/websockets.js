@@ -1,7 +1,5 @@
 'use strict';
 
-// TODO: switch to koa-ws
-
 var sockjs = require('sockjs'),
     ws_multiplex = require('websocket-multiplex');
 

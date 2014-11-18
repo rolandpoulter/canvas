@@ -6,6 +6,9 @@ require('../lib/Point.js');
 var CanvasScroll = require('./canvas_scroll.jsx'),
     CanvasOverlay = require('./canvas_overlay.jsx');
 
+var session = require('../io/session.js'),
+    view = require('../io/view.js');
+
 module.exports =
 global.CanvasView = React.createClass({
   getDefaultProps: function () {
@@ -26,6 +29,7 @@ global.CanvasView = React.createClass({
         this.props.initial_x + '10px,' +
         this.props.initial_y + '10px)';
     this.state = {
+      id: 'lalafoofoo',
       scale: this.props.initial_scale,
       style: style,
       position: new Point(this.props.initial_x, this.props.initial_y)
@@ -232,6 +236,9 @@ global.CanvasView = React.createClass({
   },
 
   render: function () {
+    session.onceSessionReady(function () {
+      view.send(JSON.stringify(this.state));
+    }.bind(this));
     /*jshint white:false, nonbsp:false*/
     // console.log(this.state.style);
     return (

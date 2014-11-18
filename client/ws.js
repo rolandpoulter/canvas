@@ -12,17 +12,17 @@ app.ws = ws;
 
 ws.ch = new WebSocketMultiplex(ws);
 
-// ws.onopen = function () {
-  // console.log('ws connection opened.');
-// };
+ws.onopen = function () {
+  console.log('ws connection opened.');
+};
 
-// ws.onmessage = function (event) {
-  // console.log('ws received a message', event);
-// };
+ws.onmessage = function (event) {
+  console.log('ws received a message', event);
+};
 
-// ws.onclose = function () {
-  // console.log('ws connection closed.');
-// };
+ws.onclose = function () {
+  console.log('ws connection closed.');
+};
 
 exports.entity = require('./io/entity.js');
 exports.session = require('./io/session.js');

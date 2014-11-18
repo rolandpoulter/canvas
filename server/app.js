@@ -16,7 +16,7 @@ app.db.redis = require('./db/redis.js');
 app.model = app.model || {};
 require('./model/Entity.js');
 require('./model/Session.js');
-require('./model/View.js');
+app.model.view = require('./model/View.js');
 require('./model/Wall.js');
 
 // Middleware

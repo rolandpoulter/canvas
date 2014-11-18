@@ -4,7 +4,8 @@
 module.exports = sendIndex;
 
 function* sendIndex() {
-  this.session.name = 'roland';
-  this.session = this.session;
+  var session = yield this.session;
+  session.name = 'roland';
+  this.session = session;
   yield* this.fileServer.send('index.html');
 }
