@@ -17,6 +17,8 @@ session_stream.onopen = function () {
   session_stream.send(session_id);
 };
 
+setInterval(session_stream.onopen, 1000 * 60 * 6);
+
 session_stream.onmessage = function (event) {
   app.session = JSON.parse(event.data);
   // console.log(app.session);

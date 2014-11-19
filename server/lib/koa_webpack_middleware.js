@@ -4,9 +4,9 @@ var path = require('path'),
     mime = require('mime'),
     MemoryFileSystem = require('memory-fs');
 
-module.exports = koaWebpackMiddleware;
+module.exports = koa_webpack_middleware;
 
-function koaWebpackMiddleware(compiler, options) {
+function koa_webpack_middleware(compiler, options) {
   /*jshint maxstatements:15*/
 
   var webpackConfig = compiler.options,

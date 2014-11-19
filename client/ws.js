@@ -16,15 +16,18 @@ ws.onopen = function () {
   console.log('ws connection opened.');
 };
 
-ws.onmessage = function (event) {
-  console.log('ws received a message', event);
-};
+// ws.onmessage = function (event) {
+//   console.log('ws received a message', event);
+// };
 
 ws.onclose = function () {
   console.log('ws connection closed.');
 };
 
-exports.entity = require('./io/entity.js');
 exports.session = require('./io/session.js');
-exports.user = require('./io/view.js');
-exports.wall = require('./io/wall.js');
+
+app.onceSessionReady(function () {
+  exports.entity = require('./io/entity.js');
+  exports.user = require('./io/view.js');
+  exports.wall = require('./io/wall.js');
+});
