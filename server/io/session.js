@@ -8,11 +8,24 @@ var session_channel = app.ws.ch.registerChannel('session');
 
 module.exports = session_channel;
 
-var publisher = redis.createClient();
+var publisher = redis.createClient(),
+    prefix = 'ws.sess:';
+
+app.ws.broadcast = function (topic, data) {
+	var msg = topic && data ? 'msg,' + topic + ',' + data : topic;
+
+	session_store.client.keys(prefix + '*')(function (err, channels) {
+		if (err) return;
+
+		channels.forEach(function (ch) {
+			publisher.publish(ch, msg);
+		});
+	});
+};
 
 session_channel.on('connection', function (session_stream) {
 	var connection = session_stream.conn,
-	    channel = 'ws:' + connection.id,
+	    channel = prefix + connection.id,
 	    client = redis.createClient();
 
 	client.subscribe(channel);
@@ -29,7 +42,7 @@ session_channel.on('connection', function (session_stream) {
 	connection.broadcast = function (topic, data) {
 		var msg = 'msg,' + topic + ',' + data;
 
-		session_store.client.keys('ws:*')(function (err, channels) {
+		session_store.client.keys(prefix + '*')(function (err, channels) {
 			if (err) return;
 
 			channels.forEach(function (ch) {

@@ -13,7 +13,7 @@ app.onceSessionReady = session_stream.onceSessionReady = function (callback) {
 
 session_stream.onopen = function () {
   var session_id = getCookieProperty(app.config.session_key);
-  console.log(session_id);
+  console.log('SESSION_ID:',session_id);
   session_stream.send(session_id);
 };
 
@@ -21,7 +21,7 @@ setInterval(session_stream.onopen, 1000 * 60 * 6);
 
 session_stream.onmessage = function (event) {
   app.session = JSON.parse(event.data);
-  // console.log(app.session);
+  console.log('SESSION:', app.session);
   var sessionCallback;
   while ((sessionCallback = sessionCallbacks.shift())) {
     setTimeout(sessionCallback.bind(null, app.session), 0);
@@ -31,7 +31,7 @@ session_stream.onmessage = function (event) {
 session_stream.onclose = function () {};
 
 function getCookieProperty(cookie_name) {
-  console.log(document.cookie);
+  console.log('COOKIE:', document.cookie);
   // Get name followed by anything except a semicolon
   var cookieRegExp = new RegExp('' + cookie_name + '[^;]+');
   var cookieProperty = cookieRegExp.exec(document.cookie);

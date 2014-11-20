@@ -13,5 +13,7 @@ var get = exports.get;
 exports.get = function *(sid) {
   console.log('GET SESSION', sid);
 
-  yield get.call(this, sid);
+  var session = yield get.call(this, sid);
+
+  return session;
 };

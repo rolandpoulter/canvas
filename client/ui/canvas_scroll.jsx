@@ -19,7 +19,7 @@ global.CanvasScroll = React.createClass({
     this.tiles = new Tiles(this.props.tile_options);
 
     this.resetInterval = setInterval(function () {
-      this.tiles.reset(this.renderTile);
+      this.resetTileView();
     }.bind(this), 10000);
 
     var state = {
@@ -30,12 +30,12 @@ global.CanvasScroll = React.createClass({
   },
 
   handleResize: function () {
-    this.updateViewState();
+    this.resetTileView();
   },
 
-  updateViewState: function () {
+  updateViewState: function (reset) {
     var state = {
-      tiles: this.updateTileView()
+      tiles: this.updateTileView(reset)
     };
 
     this.setState(state);
@@ -55,6 +55,16 @@ global.CanvasScroll = React.createClass({
     }
 
     return cell;
+  },
+
+  resetTileView: function () {
+    clearTimeout(this.resetTimer);
+    this.tiles.clear();
+    this.setState({tiles: []});
+    this.resetTimer = setTimeout(function () {
+      this.updateViewState();
+      setTimeout(this.updateTileView, 50);
+    }.bind(this), 50);
   },
 
   updateTileView: function () {

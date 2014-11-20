@@ -53,6 +53,9 @@ function createWebpackClient(config, options, build) {
 
   var webpack_config = {
     name: 'client',
+    // devtool: 'inline-source-map',
+    // debug: true,
+    // cache: true,
     entry: [
       path.join(__dirname, '..', 'client', 'index.js')
     ],
@@ -63,7 +66,7 @@ function createWebpackClient(config, options, build) {
     module: {
       loaders: [
         {test: /\.coffee$/, loader: 'coffee-redux-loader'},
-        {test: /\.jsx$/,    loader: 'react-hot-loader!jsx-loader' +
+        {test: /\.jsx$/,    loader: 'react-hot!jsx' +
                                     '?harmony&insertPragma=React.DOM'},
         {test: /\.json$/,   loader: 'json-loader'},
         {test: /\.json5$/,  loader: 'json5-loader'},

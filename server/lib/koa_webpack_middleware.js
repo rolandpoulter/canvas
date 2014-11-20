@@ -40,6 +40,9 @@ function koa_webpack_middleware(compiler, options) {
       console.log(stats);
       // console.log(stats.toString(options.stats));
     }
+    if (app.ws && app.ws.broadcast) {
+      app.ws.broadcast('refresh');
+    }
   }
 
   compiler.plugin('invalid', function () {
