@@ -5,7 +5,7 @@
 module.exports = app.db.mongo.schema.define('View', {
   // id: {type: String},
   // _id: {type: String},
-  name: {type: String, length: 255},
+  // name: {type: String, length: 255},
   // user: {type: Schema.ObjectId, index: true},
   // wall: {type: Schema.ObjectId, index: true},
   // loc: {
@@ -18,6 +18,6 @@ module.exports = app.db.mongo.schema.define('View', {
   // },
   date: {type: Date, default: Date.now},
   mdate: {type: Date, default: Date.now},
-  hidden: {type: Boolean},
-  comments: [{body: String, date: Date}]
+  // hidden: {type: Boolean},
+  // comments: [{body: String, date: Date}]
 });

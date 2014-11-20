@@ -2,26 +2,21 @@
 
 var view_channel = app.ws.ch.registerChannel('view');
 
-// var View = app.model.view;
+var View = app.model.view,
+    schema = require('../db/mongo.js').schema,
+    ObjectID = schema.ObjectID;
 
 module.exports = view_channel;
 
-// var connections = [];
+var id = new ObjectID();
 
 view_channel.on('connection', function (view_stream) {
-  // console.log(connections.length);
-  // connections.push(view_stream);
-
-  view_stream.on('close', function () {
-    // TODO: remove connection
-  });
-
   view_stream.on('data', function (data) {
-    // console.log(data);
-    // connections.forEach(function (vs) {
-      // vs.write(data);
-    // });
     view_stream.conn.broadcast('view', data);
-    // View.upsert(JSON.parse(data));
+    data = JSON.parse(data);
+    data.id = id;
+    View.upsert(data, function () {
+      console.log('upsert view:', arguments);
+    });
   });
 });
