@@ -22,11 +22,11 @@ global.CanvasScroll = React.createClass({
       this.tiles.reset(this.renderTile);
     }.bind(this), 10000);
 
-    this.state = {
+    var state = {
       tiles: this.updateTileView()
     };
 
-    return this.state;
+    return state;
   },
 
   handleResize: function () {
