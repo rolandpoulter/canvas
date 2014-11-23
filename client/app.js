@@ -19,25 +19,35 @@ global.jQuery.ajax({
 
     require('./ws.js');
 
-    app.onSession(initApp);
+    app.onSession(function (session) {
+      app.getEntityById(session.view_id, function (err, view) {
+        if (view) session.view = view;
+
+        initApp(session);
+      });
+    });
   },
   error: function () {
     console.error('Unable to get client config.');
   }
 });
 
-function initApp() {
+function initApp(session) {
   if (app.initialized) return;
 
   app.initialized = true;
 
   // global.React.unmountComponentAtNode(global.document.body);
 
+  console.log(session);
+
+  var position = session.view && session.view.position;
+
   require('./ui/canvas_view.jsx').safeRender({
     parent: global.document.body,
-    initialX: 0,
-    initialY: 0,
-    initialScale: 1,
+    initialX: position && position.x,
+    initialY: position && position.y,
+    initialScale: session.view && session.view.scale,
     tileOptions: {}
   });
 }

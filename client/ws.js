@@ -6,6 +6,8 @@ var ws = new SockJS(window.location.origin + '/ws', null, {
   devel: true
 });
 
+if (!ws) throw refresh();
+
 module.exports = exports = ws;
 
 app.io = ws;

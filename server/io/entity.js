@@ -6,6 +6,7 @@ module.exports = entity_channel;
 
 entity_channel.on('connection', function (entity_stream) {
 	entity_stream.on('data', function (data) {
+		console.log(data);
 		data = data.split('|');
 
 		var method = data[0];
@@ -18,8 +19,8 @@ entity_channel.on('connection', function (entity_stream) {
 	});
 });
 
-function respond(entity_stream, callback_id, entity_json, error) {
-	var msg = ['set', callback_id, entity_json || ''];
+function respond(method, entity_stream, callback_id, entity_json, error) {
+	var msg = [method, callback_id, entity_json || ''];
 
 	if (error) msg.push(error);
 
@@ -29,8 +30,9 @@ function respond(entity_stream, callback_id, entity_json, error) {
 var Entity = require('../model/Entity');
 
 function getEntities(entity_stream, callback_id, params) {
-	Entity.all(JSON.parse(params), function (err, entities) {
+	Entity.all(params, function (err, entities) {
 		respond(
+			'get',
 			entity_stream,
 			callback_id,
 			entities ? JSON.stringify(entities.map(toJSON)) : '[]',
@@ -45,10 +47,20 @@ function setEntity(entity_stream, callback_id, id, entity) {
 
 	if (id && entity) entity.id = id;
 
+	// if (entity.id) {
+	// 	entity._id = new Entity.schema.ObjectID(entity.id);
+	// 	delete entity.id;
+	// }
+
+	console.log(entity);
+
 	Entity.upsert(entity, function (err, entity) {
+		if (err) console.log(err);
+
 		entity = JSON.stringify(entity && entity.toJSON());
 
 		respond(
+			'set',
 			entity_stream,
 			callback_id,
 			entity,
@@ -62,6 +74,7 @@ function setEntity(entity_stream, callback_id, id, entity) {
 function removeEntity(entity_stream, callback_id, id) {
 	Entity.schema.adapter.destroy(Entity.modelName, id, function (err) {
 		respond(
+			'set',
 			entity_stream,
 			callback_id,
 			JSON.stringify(!err),

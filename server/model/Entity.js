@@ -12,12 +12,10 @@ module.exports = app.db.mongo.schema.define('Entity', {
   //   x: Number,
   //   y: Number
   // },
-  // scale: {
-  //   x: Number,
-  //   y: Number
-  // },
   date: {type: Date, default: Date.now},
   mdate: {type: Date, default: Date.now},
+  scale: Number,
+  position: Object,
   // layer: {type: Number},
   // hidden: {type: Boolean},
   // comments: [{body: String, date: Date}]
