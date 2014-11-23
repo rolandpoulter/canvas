@@ -4,38 +4,41 @@ var session_stream = app.ws.ch.channel('session');
 
 module.exports = session_stream;
 
-var sessionCallbacks = [];
+var session_callbacks = [],
+    session = null;
 
-app.onceSessionReady = session_stream.onceSessionReady = function (callback) {
-  if (app.session) return callback(app.session);
-  sessionCallbacks.push(callback);
+app.onSession = function (callback) {
+  if (session) callback(session);
+
+  session_callbacks.push(callback);
 };
 
 session_stream.onopen = function () {
   var session_id = getCookieProperty(app.config.session_key);
-  console.log('SESSION_ID:',session_id);
+
   session_stream.send(session_id);
 };
 
+// Ping session to keep it alive.
 setInterval(session_stream.onopen, 1000 * 60 * 6);
 
 session_stream.onmessage = function (event) {
-  app.session = JSON.parse(event.data);
-  console.log('SESSION:', app.session);
-  var sessionCallback;
-  while ((sessionCallback = sessionCallbacks.shift())) {
-    setTimeout(sessionCallback.bind(null, app.session), 0);
-  }
+  session = JSON.parse(event.data);
+
+  app.session = session;
+
+  session_callbacks.forEach(function (callback) {
+    callback(session);
+  });
 };
 
-session_stream.onclose = function () {};
-
 function getCookieProperty(cookie_name) {
-  console.log('COOKIE:', document.cookie);
   // Get name followed by anything except a semicolon
-  var cookieRegExp = new RegExp('' + cookie_name + '[^;]+');
-  var cookieProperty = cookieRegExp.exec(document.cookie);
+  var cookieRegExp = new RegExp('' + cookie_name + '[^;]+'),
+      cookieProperty = cookieRegExp.exec(document.cookie);
+
   if (!cookieProperty) return null;
+
   // Return everything after the equal sign
   return unescape(cookieProperty.toString().replace(/^[^=]+./, ''));
 }

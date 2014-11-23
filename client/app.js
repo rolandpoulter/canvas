@@ -16,7 +16,10 @@ global.jQuery.ajax({
   url: '/config',
   success: function (config) {
     app.config = config;
-    initApp();
+
+    require('./ws.js');
+
+    app.onSession(initApp);
   },
   error: function () {
     console.error('Unable to get client config.');
@@ -24,12 +27,11 @@ global.jQuery.ajax({
 });
 
 function initApp() {
-  require('./ws.js');
+  if (app.initialized) return;
 
-  require('./io/entity.js');
-  require('./io/session.js');
-  require('./io/view.js');
-  require('./io/wall.js');
+  app.initialized = true;
+
+  // global.React.unmountComponentAtNode(global.document.body);
 
   require('./ui/canvas_view.jsx').safeRender({
     parent: global.document.body,

@@ -13,4 +13,4 @@ require('bootstrap/dist/js/bootstrap');
 global.bootstrap = require('react-bootstrap');
 global.events = new global.EventEmitter();
 
-require('./app');
+require('./app.js');

@@ -63,7 +63,7 @@ global.CanvasScroll = React.createClass({
     this.setState({tiles: []});
     this.resetTimer = setTimeout(function () {
       this.updateViewState();
-      setTimeout(this.updateTileView, 50);
+      // setTimeout(this.updateTileView, 50);
     }.bind(this), 50);
   },
 
@@ -109,8 +109,6 @@ global.CanvasScroll = React.createClass({
       this.state.tiles.map(function (rect) {
         return rect.ref;
       });
-
-    // console.log(tiles.length);
 
     /*jshint white:false*/
     return (

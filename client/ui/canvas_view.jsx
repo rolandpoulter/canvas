@@ -7,7 +7,8 @@ var CanvasScroll = require('./canvas_scroll.jsx'),
     CanvasOverlay = require('./canvas_overlay.jsx');
 
 var session = require('../io/session.js'),
-    view = require('../io/view.js');
+    identifier = require('../io/identifier.js'),
+    entity = require('../io/entity.js');
 
 module.exports =
 global.CanvasView = React.createClass({
@@ -70,27 +71,34 @@ global.CanvasView = React.createClass({
   },
 
   setupViewListener: function () {
-    session.onceSessionReady(function () {
-      var that = this, t;
-      view.onmessage = function (event) {
-        that.noEMIT = true;
-        clearTimeout(t);
-        var view = JSON.parse(event.data),
-            state = {position: view.position};
-        that.updateBounds(state);
-        that.setState(state);
-      };
-    }.bind(this));
+    // session.onceSessionReady(function (session) {
+    //   var that = this, t;
+    //   view.onmessage = function (event) {
+    //     that.noEMIT = true;
+    //     clearTimeout(t);
+    //     var view = JSON.parse(event.data),
+    //         state = {position: view.position};
+    //     if (session.view_id) finish(session.view_id);
+    //
+    //     else identifier.getObjectId(finish);
+    //
+    //     function finish(view_id) {
+    //       state.view_id = session.view_id;
+    //       that.updateBounds(state);
+    //       that.setState(state);
+    //     }
+    //   };
+    // }.bind(this));
   },
 
   updateTileScroll: function () {
     if (!this.updateScrollWaiting) {
       this.updateScrollWaiting = true;
 
-      window.requestAnimationFrame(updateView.bind(this));
+      window.requestAnimationFrame(updateScroll.bind(this));
     }
 
-    function updateView() {
+    function updateScroll() {
       /*jshint validthis:true*/
       if (!this.refs || !this.refs.scroll) {
         delete this.updateScrollWaiting;
@@ -112,11 +120,11 @@ global.CanvasView = React.createClass({
   },
 
   broadcastState: function () {
-    if (!this.noEMIT) {
-      session.onceSessionReady(function () {
-        view.send(JSON.stringify(this.state));
-      }.bind(this));
-    }
+    // if (!this.noEMIT) {
+    //   session.onceSessionReady(function () {
+    //     view.send(JSON.stringify(this.state));
+    //   }.bind(this));
+    // }
   },
 
   computeStyle: function (state) {

@@ -14,10 +14,10 @@ app.db.mongo = require('./db/mongo.js');
 app.db.redis = require('./db/redis.js');
 
 app.model = app.model || {};
-require('./model/Entity.js');
-require('./model/Session.js');
-app.model.view = require('./model/View.js');
-require('./model/Wall.js');
+app.model.Entity = require('./model/Entity.js');
+app.model.Session = require('./model/Session.js');
+app.model.User = require('./model/User.js');
+app.model.Wall = require('./model/Wall.js');
 
 // Middleware
 require('./middleware/bundle.js');
@@ -34,7 +34,6 @@ require('./routes/wall.js');
 
 app.io = app.io || [
   require('./io/entity.js'),
-  require('./io/session.js'),
-  require('./io/view.js'),
-  require('./io/wall.js')
+  require('./io/identifier.js'),
+  require('./io/session.js')
 ];
