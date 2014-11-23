@@ -6,21 +6,22 @@ require('../lib/Point.js');
 var CanvasScroll = require('./canvas_scroll.jsx'),
     CanvasOverlay = require('./canvas_overlay.jsx');
 
-var session = require('../io/session.js'),
-    identifier = require('../io/identifier.js'),
-    entity = require('../io/entity.js');
+// var session = require('../io/session.js'),
+    // identifier = require('../io/identifier.js'),
+    // entity = require('../io/entity.js');
 
 module.exports =
 global.CanvasView = React.createClass({
   getDefaultProps: function () {
-    var state = {
+    var props = {
+      view_id: app.session.view_id,
       initial_x: 0,
       initial_y: 0,
       initial_scale: 1,
       tile_options: {}
     };
 
-    return state;
+    return props;
   },
 
   getInitialState: function () {
@@ -71,6 +72,9 @@ global.CanvasView = React.createClass({
   },
 
   setupViewListener: function () {
+    app.onEntityUpdate(function (entity) {
+      console.log(entity);
+    });
     // session.onceSessionReady(function (session) {
     //   var that = this, t;
     //   view.onmessage = function (event) {
@@ -120,11 +124,12 @@ global.CanvasView = React.createClass({
   },
 
   broadcastState: function () {
-    // if (!this.noEMIT) {
-    //   session.onceSessionReady(function () {
-    //     view.send(JSON.stringify(this.state));
-    //   }.bind(this));
-    // }
+    if (!this.noEMIT) {
+      app.setEntity(this.props.view_id, this.state, function () {});
+      // session.onceSessionReady(function () {
+      //   view.send(JSON.stringify(this.state));
+      // }.bind(this));
+    }
   },
 
   computeStyle: function (state) {

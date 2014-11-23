@@ -46,11 +46,16 @@ function setEntity(entity_stream, callback_id, id, entity) {
 	if (id && entity) entity.id = id;
 
 	Entity.upsert(entity, function (err, entity) {
+		entity = JSON.stringify(entity && entity.toJSON());
+
 		respond(
 			entity_stream,
 			callback_id,
-			JSON.stringify(entity && entity.toJSON()),
+			entity,
 			err && 'Failed to save entity: ' + id);
+
+		entity_stream.conn.broadcast('entity',
+			['update', entity].join('|'));
 	});
 }
 

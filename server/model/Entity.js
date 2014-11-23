@@ -21,4 +21,6 @@ module.exports = app.db.mongo.schema.define('Entity', {
   // layer: {type: Number},
   // hidden: {type: Boolean},
   // comments: [{body: String, date: Date}]
-}, {});
+}, {
+  table: 'entities'
+});

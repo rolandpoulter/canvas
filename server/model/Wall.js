@@ -2,7 +2,7 @@
 
 // var Schema = require('jugglingdb').Schema;
 
-module.exports = app.db.mongo.schema.define('Entity', {
+module.exports = app.db.mongo.schema.define('Wall', {
   name: {type: String, length: 255},
   // user: {type: Schema.ObjectId, index: true},
   // loc: {
@@ -17,4 +17,6 @@ module.exports = app.db.mongo.schema.define('Entity', {
   mdate: {type: Date, default: Date.now},
   layer: Number,
   hidden: Boolean
+}, {
+  table: 'walls'
 });
