@@ -39,12 +39,12 @@ function initApp(session) {
 
   // global.React.unmountComponentAtNode(global.document.body);
 
-  console.log(session);
+  // console.log(session);
 
   var position = session.view && session.view.position;
 
   require('./ui/canvas_view.jsx').safeRender({
-    parent: global.document.body,
+    parent: global.wall_io_canvas,
     initialX: position && position.x,
     initialY: position && position.y,
     initialScale: session.view && session.view.scale,

@@ -85,8 +85,6 @@ entity_stream.onmessage = function (event) {
   if (!data_callbacks[method] || !data_callbacks[method][callback_id])
     throw new Error('Received invalid entity data: ' + event.data);
 
-  console.log(error, response);
-
   data_callbacks[method][callback_id](error, response);
 
   delete data_callbacks[method][callback_id];

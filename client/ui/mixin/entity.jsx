@@ -3,11 +3,8 @@
 
 require('../lib/Point.js');
 
-var CanvasScroll = require('./canvas_scroll.jsx'),
-    CanvasOverlay = require('./canvas_overlay.jsx');
-
 module.exports =
-global.CanvasView = React.createClass({
+global.Entity = React.createClass({
   getDefaultProps: function () {
     var props = {
       view_id: app.session.view_id,
@@ -131,66 +128,25 @@ global.CanvasView = React.createClass({
     return style;
   },
 
-  render: function () {
-    /*jshint white:false, nonbsp:false*/
-    var style = this.computeStyle();
-
-    this.updateTileScroll();
-
-    return (
-      <div className="canvas-view"
-           onTouchStart={this.handleTouchStart}
-           onTouchMove={this.handleTouchMove}
-           onTouchCancel={this.handleTouchStop}
-              onTouchEnd={this.handleTouchStop}
-           onMouseDown={this.handleMouseDown}
-           onMouseMove={this.handleMouseMove}
-           onMouseUp={this.handleMouseUp}>
-        <div className="position">
-          {this.state.position.x},&nbsp;
-          {this.state.position.y},&nbsp;
-          {this.state.scale}
-        </div>
-        <div className="canvas-view-transform"
-             style={style}>
-          <CanvasScroll ref="scroll"
-                        view={this}
-                        tile_options={this.props.tile_options}/>
-        </div>
-        <CanvasOverlay ref="overlay"/>
-        <div className="buttons">
-          <a href="#"
-             className="button zoom-in"
-             onClick={this.handleZoomIn}>Zoom In</a>
-          &nbsp;|&nbsp;
-          <a href="#"
-             className="button zoom-out"
-             onClick={this.handleZoomOut}>Zoom Out</a>
-        </div>
-      </div>
-    );
+  componentDidMount: function () {
+    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('touchstart', this.handleTouchStart);
+    window.addEventListener('touchmove', this.handleTouchMove);
+    window.addEventListener('touchmove', this.handleTouchStop);
+    window.addEventListener('mousedown', this.handleMouseDown);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
   },
 
-
-    componentDidMount: function () {
-      window.addEventListener('resize', this.handleResize);
-      window.addEventListener('touchstart', this.handleTouchStart);
-      window.addEventListener('touchmove', this.handleTouchMove);
-      window.addEventListener('touchmove', this.handleTouchStop);
-      window.addEventListener('mousedown', this.handleMouseDown);
-      window.addEventListener('mousemove', this.handleMouseMove);
-      window.addEventListener('mouseup', this.handleMouseUp);
-    },
-
-    componentWillUnmount: function () {
-      window.removeEventListener('resize', this.handleResize);
-      window.removeEventListener('touchstart', this.handleTouchStart);
-      window.removeEventListener('touchmove', this.handleTouchMove);
-      window.removeEventListener('touchmove', this.handleTouchStop);
-      window.removeEventListener('mousedown', this.handleMouseDown);
-      window.removeEventListener('mousemove', this.handleMouseMove);
-      window.removeEventListener('mouseup', this.handleMouseUp);
-    },
+  componentWillUnmount: function () {
+    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('touchstart', this.handleTouchStart);
+    window.removeEventListener('touchmove', this.handleTouchMove);
+    window.removeEventListener('touchmove', this.handleTouchStop);
+    window.removeEventListener('mousedown', this.handleMouseDown);
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('mouseup', this.handleMouseUp);
+  },
 
   handleZoomIn: function () {
     var state = {
@@ -315,17 +271,3 @@ global.CanvasView = React.createClass({
     delete this.lastMousePosition;
   }
 });
-
-var CanvasView = module.exports;
-
-CanvasView.safeRender = function (props) {
-  /*jshint white:false*/
-  var canvas_view =
-    <CanvasView
-      initial_x={props.initialX}
-      initial_y={props.initialY}
-      initial_scale={props.initialScale}
-      tile_options={props.tileOptions}/>;
-
-  return React.renderComponent(canvas_view, props && props.parent);
-};

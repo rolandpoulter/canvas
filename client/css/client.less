@@ -1,6 +1,6 @@
 @import 'bootstrap';
 
-html, body {
+html, body, #wall_io_canvas {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -22,6 +22,20 @@ body {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
+}
+
+#wall_io_logo {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 500px;
+  height: 100px;
+}
+
+#wall_io_canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .canvas-view {

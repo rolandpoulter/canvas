@@ -5,13 +5,17 @@
   <title>Wall.IO</title>
   <meta name="description" content="Wall.IO">
   <link rel="stylesheet" href="/css/client.css">
-  <script>window.onerror = function () { window.location = window.location; };</script>
+  <script>
+    window.onerror = function () {
+      setTimeout(window.location.reload.bind(window.location), 5000);
+    };
+  </script>
   <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 </head>
 <body>
-	<script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-	<!--<script src="http://cdn.sockjs.org/websocket-multiplex-0.1.js"></script>-->
-  <script src="/js/websocket_multiplex.js"></script>
   <script src="/js/client.js"></script>
+  <img id="wall_io_logo"
+       src="/img/wall.io.svg"></img>
+  <div id="wall_io_canvas"></div>
 </body>
 </html>

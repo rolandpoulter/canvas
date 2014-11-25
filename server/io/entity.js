@@ -6,7 +6,6 @@ module.exports = entity_channel;
 
 entity_channel.on('connection', function (entity_stream) {
 	entity_stream.on('data', function (data) {
-		console.log(data);
 		data = data.split('|');
 
 		var method = data[0];
@@ -46,13 +45,6 @@ function setEntity(entity_stream, callback_id, id, entity) {
 		return removeEntity(entity_stream, callback_id, id);
 
 	if (id && entity) entity.id = id;
-
-	// if (entity.id) {
-	// 	entity._id = new Entity.schema.ObjectID(entity.id);
-	// 	delete entity.id;
-	// }
-
-	console.log(entity);
 
 	Entity.upsert(entity, function (err, entity) {
 		if (err) console.log(err);

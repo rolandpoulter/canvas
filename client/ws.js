@@ -1,5 +1,9 @@
 'use strict';
-/*global window, app, SockJS, WebSocketMultiplex*/
+/*global window, app*/
+
+var SockJS = require('sockjs-client'),
+    WebSocketMultiplex =
+      require('websocket-multiplex/multiplex_client.js').MultiplexClient;
 
 var ws = new SockJS(window.location.origin + '/ws', null, {
   debug: true,
