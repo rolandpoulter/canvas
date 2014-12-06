@@ -1,7 +1,7 @@
 'use strict';
 /*global React, Tiles*/
 
-require('../lib/Tiles.js');
+require('./lib/Tiles.js');
 
 var CanvasTile = require('./canvas_tile.jsx');
 

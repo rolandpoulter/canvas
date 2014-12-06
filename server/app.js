@@ -1,39 +1,35 @@
 'use strict';
 
-// app.debug();
+require('../config');
+require('../logger.js');
 
-app.name = 'wall-io-canvas';
+if (config.debug && app.debug) app.debug();
 
-app.keys = [
-  'wall-io-canvas_key_1',
-  'key_canvas-io-wall_2'
-];
+app.db = {};
+require('./db/mongo.js');
+require('./db/redis.js');
 
-app.db = app.db || {};
-app.db.mongo = require('./db/mongo.js');
-app.db.redis = require('./db/redis.js');
+app.model = {};
+require('./model/Entity.js');
+require('./model/Session.js');
+require('./model/User.js');
+require('./model/Wall.js');
 
-app.model = app.model || {};
-app.model.Entity = require('./model/Entity.js');
-app.model.Session = require('./model/Session.js');
-app.model.User = require('./model/User.js');
-app.model.Wall = require('./model/Wall.js');
-
-// Middleware
+app.middleware = {};
 require('./middleware/bundle.js');
 require('./middleware/styles.js');
 require('./middleware/static.js');
-require('./middleware/websockets.js');
 require('./middleware/session.js');
 require('./middleware/router.js');
 
-// Routes
+app.io = {};
+require('./ws.js');
+require('./io/entity.js');
+require('./io/identifier.js');
+require('./io/session.js');
+
+app.routes = {};
 require('./routes/config.js');
-require('./routes/index.js');
 require('./routes/wall.js');
 
-app.io = app.io || [
-  require('./io/entity.js'),
-  require('./io/identifier.js'),
-  require('./io/session.js')
-];
+// if (module.hot) module.hot.accept();

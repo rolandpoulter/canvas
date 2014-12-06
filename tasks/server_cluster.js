@@ -1,41 +1,43 @@
 'use strict';
 
-process.env.NODE_ENV = 'production';
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+
+var cluster = require('cluster'),
+    gulp = require('gulp'),
+    path = require('path'),
+    os = require('os');
+var App = require('./lib/App.js');
 
 exports.create = startServerCluster;
 
-global.config = global.config || require('../config');
-
-var logger = console;
+require('../config');
+require('../logger.js');
 
 if (!module.parent) main();
 
 else try {
-    logger = require('gulp-util');
-    require('gulp').task('server_cluster', main);
-  } catch (err) {}
+  logger.useGulpUtilLogger();
+  gulp.task('server_cluster', main);
+}
+
+catch (err) {App.error(err);}
 
 function main() {
-  process.on('uncaughtException', error);
-  try { return startServerCluster(); } catch (err) { error(err); }
+  process.on('uncaughtException', App.error);
+
+  try {return startServerCluster();}
+
+  catch (err) {App.error(err);}
 }
 
-function error(err) {
-  logger.error(err.stack || err);
-  process.nextTick(process.exit);
-}
-
-function startServerCluster(config) {
+function startServerCluster() {
   /*jshint maxstatements:20*/
 
-  config = config || global.config;
-
-  var cluster = require('cluster'),
-      numCPUs = require('os').cpus().length;
+  var numCPUs = os.cpus().length;
 
   if (cluster.isMaster) {
     cluster.setupMaster({
-      exec: __dirname + require('path').sep + 'server_worker.js'
+      exec: __dirname + path.sep + 'server_worker.js'
     });
 
     var threads = Math.min(numCPUs, config.server.cluster || 3),
@@ -49,12 +51,14 @@ function startServerCluster(config) {
       logger.log(process.title + ': child worker ' +
                  worker.process.pid + ' died.',
                  code, signal);
+
       clearTimeout(timeouts[worker.id]);
       cluster.fork();
     });
 
     cluster.on('fork', function (worker) {
       logger.log(process.title + ': forked child ' + worker.process.pid + '.');
+
       timeouts[worker.id] = setTimeout(timeoutErrorMsg, 2000);
       timeouts[worker.id].unref();
     });
@@ -63,11 +67,12 @@ function startServerCluster(config) {
       logger.log(process.title + ': listening to child ' +
                  worker.process.pid + '.',
                  address.address + ':' + address.port);
+
       clearTimeout(timeouts[worker.id]);
     });
   }
 
   function timeoutErrorMsg() {
-    console.error(process.title + ': is unable to reach a child worker.');
+    logger.error(process.title + ': is unable to reach a child worker.');
   }
 }

@@ -8,12 +8,12 @@ var session_store = redisStore({
 
 module.exports = exports = session_store;
 
-// var get = exports.get;
+var get = exports.get;
 
-// exports.get = function *(sid) {
-//   console.log('GET SESSION', sid);
-//
-//   var session = yield get.call(this, sid);
-//
-//   return session;
-// };
+exports.get = function *(sid) {
+  if (config.debug) logger.log('GET SESSION', sid);
+
+  var session = yield get.call(this, sid);
+
+  return session;
+};

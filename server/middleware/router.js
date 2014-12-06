@@ -4,4 +4,4 @@ var kroute = require('kroute');
 
 app.router = kroute();
 
-app.use(app.router);
+app.base.use(app.router);

@@ -20,6 +20,8 @@ global.jQuery.ajax({
     require('./ws.js');
 
     app.onSession(function (session) {
+      if (app.config.debug) console.log(session);
+
       app.getEntityById(session.view_id, function (err, view) {
         if (view) session.view = view;
 
@@ -38,8 +40,6 @@ function initApp(session) {
   app.initialized = true;
 
   // global.React.unmountComponentAtNode(global.document.body);
-
-  // console.log(session);
 
   var position = session.view && session.view.position;
 

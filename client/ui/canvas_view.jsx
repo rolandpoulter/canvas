@@ -1,7 +1,7 @@
 'use strict';
 /*global React, Point, window*/
 
-require('../lib/Point.js');
+require('./lib/Point.js');
 
 var CanvasScroll = require('./canvas_scroll.jsx'),
     CanvasOverlay = require('./canvas_overlay.jsx');

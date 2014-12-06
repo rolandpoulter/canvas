@@ -4,26 +4,33 @@ exports.build = buildWebpackClient;
 
 exports.create = createWebpackClient;
 
-global.config = global.config || require('../config');
+require('../config');
+require('../logger.js');
 
-var log = console.log,
-    path = require('path'),
+var gulp = require('gulp'),
+    gulpWebpack = require('gulp-webpack'),
     webpack = require('webpack');
 
 if (!module.parent) {
-  webpack = require('gulp-webpack');
+  webpack = gulpWebpack;
   main();
 }
 
 else try {
-    log = require('gulp-util').log;
-    webpack = require('gulp-webpack');
-    require('gulp').task('webpack_client', main);
-  } catch (err) {}
+  logger.useGulpUtilLogger();
+  webpack = gulpWebpack;
+
+  gulp.task('webpack_client', main);
+}
+
+catch (err) {}
 
 function main() {
   process.on('uncaughtException', error);
-  try { return buildWebpackClient(); } catch (err) { error(err); }
+
+  try {return buildWebpackClient();}
+
+  catch (err) {error(err);}
 }
 
 function error(err) {
@@ -33,15 +40,14 @@ function error(err) {
 
 function buildWebpackClient() {
   var compiler = createWebpackClient(null, null, build),
-      o = build();
+      output = build();
 
-  return global.is_watching ? {} : o;
+  return global.is_watching ? {} : output;
 
   function build() {
-    var gulp = require('gulp');
-    gulp.src('client/index.js')
+    gulp.src(config.task.webpack_src)
       .pipe(compiler)
-      .pipe(gulp.dest('static/js'));
+      .pipe(gulp.dest(config.task.webpack_dest));
   }
 }
 
@@ -51,47 +57,14 @@ function createWebpackClient(config, options, build) {
   config = config || global.config;
   options = options || {};
 
-  var webpack_config = {
-    name: 'client',
-    // devtool: 'inline-source-map',
-    // debug: true,
-    // cache: true,
-    entry: [
-      path.join(__dirname, '..', 'client', 'index.js')
-    ],
-    output: {
-      path: path.join(__dirname, '..', 'static', 'js'),
-      filename: 'client.js'
-    },
-    module: {
-      loaders: [
-        {test: /\.coffee$/, loader: 'coffee-redux-loader'},
-        {test: /\.jsx$/,    loader: 'react-hot!jsx' +
-                                    '?harmony&insertPragma=React.DOM'},
-        {test: /\.json$/,   loader: 'json-loader'},
-        {test: /\.json5$/,  loader: 'json5-loader'},
-        {test: /\.txt$/,    loader: 'raw-loader'},
-        {test: /\.html$/,   loader: 'html-loader'},
-        {test: /\.md$/,     loader: 'html-loader!markdown-loader'},
-        {test: /\.ms$/,     loader: 'mustache-loader'},
-        {test: /\.png$/,    loader: 'url-loader'},
-        {test: /\.obj$/,    loader: 'file-loader'},
-        {test: /\.css$/,    loader: 'style-loader!css-loader'}
-      ]
-    },
-    plugins: []
-  };
-
-  if (options.returnConfig) {
-    return webpack_config;
-  }
-
-  var compiler = webpack(webpack_config);
+  var compiler = webpack(config.webpack);
 
   if (build && (global.is_watching || options.watch)) {
     compiler.watch(200, function (err, stats) {
-      if (err) console.error(err);
-      log('Changed', stats);
+      logger.log('Changed', stats);
+
+      if (err) logger.error(err);
+
       build();
     });
   }

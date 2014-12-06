@@ -30,16 +30,19 @@ function koa_webpack_middleware(compiler, options) {
 
   function handleCompile(err, stats) {
     compiling = false;
+
     if (err) {
       console.error('Compilation failed. Trying agian...');
       setTimeout(function () {
         compiler.watch(200, handleCompile);
       }, 500);
     }
+
     if (!options.quiet && stats) {
       console.log(stats);
       // console.log(stats.toString(options.stats));
     }
+
     if (app.ws && app.ws.broadcast) {
       app.ws.broadcast('refresh');
     }
@@ -76,6 +79,7 @@ function koa_webpack_middleware(compiler, options) {
     var url = this.url;
 
     var qidx = this.url.indexOf('?');
+
     if (qidx >= 0) {
       url = url.substr(0, qidx);
     }
@@ -95,20 +99,24 @@ function koa_webpack_middleware(compiler, options) {
 
     // Do a file stat
     var fileStat = null;
+
     try {
       // Bundle file if exists in memory fs
       fileStat = mfs.statSync(outputFile);
+
       if (fileStat.isFile()) {
         isBundleFile = true;
       }
-    } catch (e) {}
+    }
+
+    catch (e) {}
 
     if (!isBundleFile) {
       return yield next;
     }
 
     // If we're here, we have a webpack entry file
-    console.log('GET %s', url);
+    logger.log('GET %s', url);
 
     // If compiling, await completion
     if (compiling) {

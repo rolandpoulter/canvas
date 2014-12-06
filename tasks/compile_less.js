@@ -1,35 +1,30 @@
 'use strict';
 
+var gulp = require('gulp'),
+    less = require('gulp-less');
+var App = require('./lib/App.js');
+
 exports.compile = compileLess;
 
-global.config = global.config || require('../config');
-
-var path = require('path'),
-    gulp = require('gulp'),
-    less = require('gulp-less');
+require('../config');
+require('../logger.js');
 
 if (!module.parent) main();
 
-else try {
-    require('gulp').task('compile_less', main);
-  } catch (err) {}
+else try {gulp.task('compile_less', main);}
+
+catch (err) {}
 
 function main() {
-  process.on('uncaughtException', error);
-  try { return compileLess(); } catch (err) { error(err); }
-}
+  process.on('uncaughtException', App.error);
 
-function error(err) {
-  console.error(err.stack || err);
-  process.nextTick(process.exit);
+  try {return compileLess();}
+
+  catch (err) {App.error(err);}
 }
 
 function compileLess() {
-  gulp.src('./client/css/*.less')
-    .pipe(less({
-      paths: [
-        path.join(__dirname, '..', 'node_modules', 'bootstrap', 'less')
-      ]
-    }))
-    .pipe(gulp.dest('./static/css'));
+  gulp.src(config.task.less_src)
+    .pipe(less({paths: config.server.app.less_paths}))
+    .pipe(gulp.dest(config.task.less_dest));
 }

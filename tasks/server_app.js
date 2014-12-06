@@ -1,114 +1,33 @@
 'use strict';
 
+var gulp = require('gulp');
+var App = require('./lib/App.js');
+
 exports.run = runApp;
 
-exports.load = loadApp;
-
-global.config = global.config || require('../config');
-
-var path = require('path'),
-    koa = require('koa'),
-    koala = require('koala'),
-    logger = console;//require('../lib/logger.js');
+require('../config');
+require('../logger.js');
 
 if (!module.parent) main();
 
 else try {
-    logger = require('gulp-util');
-    require('gulp').task('server', main);
-  } catch (err) {}
+  logger.useGulpUtilLogger();
+  gulp.task('server', main);
+}
+
+catch (err) {App.error(err);}
 
 function main() {
-  process.on('uncaughtException', error);
+  process.on('uncaughtException', App.error);
+
   try {
-    process.title = 'node' + require('../package.json').name + 'App';
+    process.title = 'node' + config.package.name + 'App';
     return runApp();
-  } catch (err) { error(err); }
+  }
+
+  catch (err) {App.error(err);}
 }
 
-function error(err) {
-  logger.error(err.stack || err);
-  process.nextTick(process.exit);
-}
-
-function runApp(config) {
-  config = config || global.config;
-
-  return loadApp(config)
-    .createServer(config.app_entry ||
-                  path.join(__dirname, '..', 'server', 'app.js'))
-    .setupServer()
-    .listen();
-}
-
-function loadApp(config, domain) {
-  /*jshint maxstatements:25, maxcomplexity:10*/
-
-  config = config || global.config;
-
-  var app = global.app || !config.koa ? koala({
-    session: false,
-    fileServer: {
-      root: config.static_root ||
-            path.join(__dirname, '..', 'static'),
-      index: true,
-      hidden: true,
-      maxage: config.static_max_age || 0//'1 year'
-    }
-  }) : koa(); // TODO:
-
-  app.config = config || {};
-  app.domain = domain || null;
-
-  if (global.app) return global.app;
-
-  global.app = app;
-
-  app.events = new (require('events').EventEmitter)();
-
-  app.createServer = function (_app_entry_path) {
-    var appRequire;
-    if (_app_entry_path) {
-      if (!!config.hotCode) {// TODO:
-        require(_app_entry_path);
-      }
-      else {
-        appRequire = require('enhanced-require')(module, {
-          substitutions: {
-            'jugglingdb-mongodb': require('jugglingdb-mongodb') // Hack
-          },
-          recursive: true,
-          watch: true,
-          hot: true
-        });
-        appRequire(_app_entry_path);
-      }
-    }
-    app.events.emit('before_server_created');
-    app.server = config.ssl ?
-      require('https').createServer(config.ssl, app.callback()) :
-      require('http').createServer(app.callback());
-    app.events.emit('after_server_created', app.server);
-    return app;
-  };
-
-  app.setupServer = function (web_server) {
-    web_server = web_server || app.server;
-    app.events.emit('setup_server', web_server);
-    return app;
-  };
-
-  app.listen = function (web_server, server_config) {
-    web_server = web_server || app.server;
-    server_config = server_config || app.config.server;
-    logger.log('#' + process.pid + ' - ' +
-               server_config.host + ':' +
-               server_config.port);
-    web_server.listen(server_config.port,
-                      server_config.host || '0.0.0.0');
-    app.events.emit('server_listen', web_server);
-    return app;
-  };
-
-  return app;
+function runApp() {
+  return new App().run()();
 }

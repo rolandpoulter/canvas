@@ -1,10 +1,5 @@
 'use strict';
 
-exports.client = {
-  session_key: 'wall.id'
-};
+require('./config.js');
 
-exports.server = {
-  host: '0.0.0.0',
-  port: 3000
-};
+if (!module.parent) logger.log(config);

@@ -60,7 +60,7 @@ session_channel.on('connection', function (session_stream) {
 	});
 
 	session_stream.on('data', function (session_id) {
-		session_id = app.config.session.prefix + session_id;
+		session_id = config.server.app.session.prefix + session_id;
 
 		session_store.client.get(session_id)(handleSession);
 

@@ -15,10 +15,11 @@
     "chai": "^1.10.0",
     "co": "^4.0.0",
     "coffee-redux-loader": "^0.7.2",
+    "commander": "^2.5.0",
     "compress": "^0.99.0",
     "css-loader": "^0.9.0",
     "debug": "^2.1.0",
-    "enhanced-require": "^0.5.0-beta6",
+    "enhanced-require": "0.4.2",
     "file-loader": "^0.8.1",
     "gulp": "^3.8.10",
     "gulp-less": "^1.3.6",
@@ -61,7 +62,6 @@
     "react-hot-loader": "^0.5.0",
     "react-widgets": "^2.0.1",
     "redis": "^0.12.1",
-    "rtc": "^3.1.2",
     "sinon": "^1.12.1",
     "sinon-chai": "^2.6.0",
     "sockjs": "^0.3.11",
@@ -110,7 +110,8 @@
     "maxstatements": 10,
     "predef": [
       "app",
-      "config"
+      "config",
+      "logger"
     ]
   }
 }

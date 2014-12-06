@@ -1,26 +1,10 @@
 'use strict';
 
-var session = require('koa-generic-session');
+var session = require('koa-generic-session'),
+    session_store = require('../lib/session_store.js');
 
-var expire_time = 1000 * 60 * 60 * 24 * 7; // 1 week
+var session_config = config.server.app.session;
 
-app.config.session = {
-  ttl: expire_time,
-  key: 'wall.id',
-  prefix: 'wall.sess:',
-  defer: true,
-  rolling: false,
-  allowEmpty: true,
-  cookie: {
-    path: '/',
-    maxAge: expire_time,
-    signed: false,
-    secure: false,
-    httpOnly: false,
-    overwrite: true,
-    secureProxy: false
-  },
-  store: require('../lib/session_store.js')
-};
+session_config.store = session_store;
 
-app.use(session(app.config.session));
+app.base.use(session(session_config));

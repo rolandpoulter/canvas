@@ -1,59 +1,53 @@
 'use strict';
 
-exports.start = startServerWorker;
+var cluster = require('cluster'),
+    domain = require('domain'),
+    gulp = require('gulp');
+var App = require('./lib/App.js');
 
-global.config = global.config || require('../config');
+require('../config');
+require('../logger.js');
+
+exports.start = startServerWorker;
 
 if (!module.parent) main();
 
 else try {
-    require('gulp').task('server_worker', main);
-  } catch (err) {}
+  logger.useGulpUtilLogger();
+  gulp.task('server_worker', main);
+}
+
+catch (err) {App.error(err);}
 
 function main() {
-  process.on('uncaughtException', error);
+  process.on('uncaughtException', App.error);
+
   try {
     process.title = 'node' + require('../package.json').name + 'Wkr';
     startServerWorker();
-  } catch (err) { error(err); }
+  }
+
+  catch (err) {App.error(err);}
 }
 
-function error(err) {
-  console.error(err.stack || err);
-  process.nextTick(process.exit);
-}
+function startServerWorker() {
+  var app = new App(domain.create()),
+      run = app.run();
 
-function startServerWorker(config) {
-  config = config || global.config;
-
-  var cluster = require('cluster');
-
-  var domain = require('domain').create();
-  var app = require('./server_app.js').load(config, domain);
-
-  app.createServer(__dirname + '/../server/app.js');
-  app.setupServer();
-
-  domain.on('error', function (error) {
-    console.error(error.stack || error);
-    reset();
-  });
-
-  domain.run(function () {
-    app.listen();
-  });
+  app.domain.on('error', reset);
+  app.domain.run(run);
 
   return reset;
 
-  function reset() {
+  function reset(err) {
+    if (err) return App.error(err);
+
     try {
       setTimeout(process.exit.bind(process, 1), 30000).unref();
       if (app.server) app.server.close();
       if (cluster.worker) cluster.worker.disconnect();
     }
-    catch (error) {
-      console.error(error.stack || error);
-      process.exit(1);
-    }
+
+    catch (err) {App.error(err);}
   }
 }
