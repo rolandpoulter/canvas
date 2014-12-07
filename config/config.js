@@ -11,7 +11,40 @@ if (global.config)
 
 global.config = exports;
 
-var app_envrionment = process.env.NODE_ENV || 'development';
+commander
+  .version(package_json.version)
+  .option('-e, --environment [env]',
+    'Set config.environment to [env].')
+  .option('-a, --hot_code',
+    'Use hot code loading.')
+  .option('-d, --debug',
+    'Enable debugging.')
+  .option('-c, --cluster [count]',
+    'Cluster [count].', parseInt)
+  .option('-s, --session_key [key]',
+    'Set session key to [key].')
+  .option('-e, --app_entry [path]',
+    'Set the entry path for the app to [path]')
+  .option('-k, --app_keys [keys]',
+    'Set keys for the app to [keys]')
+  .option('-n, --app_name [name]',
+    'Set the name of the app to [name]')
+  .option('-n, --less_paths [paths]',
+    'Set the less paths to compile: [paths]')
+  .option('-m, --max_age [max_age]',
+    'Set the max age for static files: [max_age]', JSON.parse)
+  .option('-s, --static_paths [paths]',
+    'Set the less paths to compile: [paths]')
+  .option('-l, --host [host]',
+    'Set the server host to [host]')
+  .option('-n, --port [port]',
+    'Set the server port to [port]', parseInt)
+  .parse(process.argv);
+
+var app_envrionment =
+  commander.environment ||
+  process.env.NODE_ENV ||
+  'development';
 
 try {
   var target_environment = require('./' + app_envrionment + '.js');
@@ -27,45 +60,18 @@ exports.package = package_json;
 // if (!module.parent) logger.log(config);
 
 function mixin(imports) {
-  /*jshint maxstatements:36*/
+  /*jshint maxstatements:40*/
   imports = imports || {};
 
-  commander
-    .version(package_json.version)
-    .option('-e, --environment [env]',
-      'Set config.environment to [env].')
-    .option('-a, --hot_code',
-      'Use hot code loading.')
-    .option('-d, --debug',
-      'Enable debugging.')
-    .option('-c, --cluster [count]',
-      'Cluster [count].', parseInt)
-    .option('-s, --session_key [key]',
-      'Set session key to [key].')
-    .option('-e, --app_entry [path]',
-      'Set the entry path for the app to [path]')
-    .option('-k, --app_keys [keys]',
-      'Set keys for the app to [keys]')
-    .option('-n, --app_name [name]',
-      'Set the name of the app to [name]')
-    .option('-n, --less_paths [paths]',
-      'Set the less paths to compile: [paths]')
-    .option('-m, --max_age [max_age]',
-      'Set the max age for static files: [max_age]', JSON.parse)
-    .option('-s, --static_paths [paths]',
-      'Set the less paths to compile: [paths]')
-    .option('-l, --host [host]',
-      'Set the server host to [host]')
-    .option('-n, --port [port]',
-      'Set the server port to [port]', parseInt)
-    .parse(process.argv);
+  assign('debug', false);
 
-  assign('debug', false, commander.debug);
+  if (commander.debug)
+    global.config.debug = !global.config.debug;
 
   if (global.config.debug && !process.env.DEBUG)
     process.env.DEBUG = '*';
 
-  assign('environment', 'default', commander.environment);
+  assign('environment', 'default', app_envrionment);
 
   assign('client.debug', global.config.debug);
   assign('client.session_key', 'wall.id', commander.session_key);

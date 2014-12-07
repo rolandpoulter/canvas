@@ -21,10 +21,12 @@ app.getClientID = function () {
 };
 
 app.getEntityById = function (id, callback) {
+  // console.log('get entity:', id);
   app.getEntities({
     where: {id: id},
     limit: 1
   }, function (err, entities) {
+    // console.log(err, entities && entities[0]);
     callback(err, entities && entities[0]);
   });
 };

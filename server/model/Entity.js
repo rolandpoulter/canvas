@@ -14,7 +14,8 @@ module.exports = app.db.mongo.schema.define('Entity', {
   space: {type: Object, default: {}},
   layer: {type: Number, default: 0, index: true},
   scale: {type: Number, default: 1, index: true},
-  hidden: {type: Boolean, default: false, index: true}
+  hidden: {type: Boolean, default: false, index: true},
+  position: Object
 }, {
   table: 'entities'
 });
