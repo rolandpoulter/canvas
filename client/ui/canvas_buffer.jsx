@@ -6,7 +6,7 @@ require('./lib/Tiles.js');
 var CanvasTile = require('./canvas_tile.jsx');
 
 module.exports =
-global.CanvasScroll = React.createClass({
+global.CanvasBuffer = React.createClass({
   getDefaultProps: function () {
     var props = {
       view: null,
@@ -119,14 +119,14 @@ global.CanvasScroll = React.createClass({
   }
 });
 
-var CanvasScroll = module.exports;
+var CanvasBuffer = module.exports;
 
-CanvasScroll.safeRender = function (props) {
+CanvasBuffer.safeRender = function (props) {
   /*jshint white:false*/
-  var canvas_scroll =
-    <CanvasScroll
+  var canvas_buffer =
+    <CanvasBuffer
       view={props.view}
       tile_options={props.tileOptions}/>;
 
-  return React.renderComponent(canvas_scroll, props && props.parent);
+  return React.renderComponent(canvas_buffer, props && props.parent);
 };

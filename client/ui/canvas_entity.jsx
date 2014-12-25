@@ -1,23 +1,19 @@
 'use strict';
 /*global React, Point, window*/
 
-require('./bounds.jsx');
-require('./hidden.jsx');
-require('./layer.jsx');
-require('./position.jsx');
-require('./scale.jsx');
+require('./lib/Point.js');
 
 module.exports =
-global.EntityMixin = React.createClass({
-  mixins: [BoundsMixin, HiddenMixin, LayerMixin, PositionMixin, ScaleMixin],
-
+global.CanvasEntity = React.createClass({
   getDefaultProps: function () {
     var props = {
       view_id: app.session.view_id,
       initial_x: 0,
       initial_y: 0,
       initial_scale: 1,
-      tile_options: {}
+      initial_width: 0,
+      initial_height: 0,
+      entity_options: {}
     };
 
     return props;
@@ -26,6 +22,8 @@ global.EntityMixin = React.createClass({
   getInitialState: function () {
     var state = {
       scale: this.props.initial_scale,
+      width: this.props.initial_width,
+      height: this.props.initial_height,
       position: new Point(
         this.props.initial_x,
         this.props.initial_y)
@@ -52,22 +50,10 @@ global.EntityMixin = React.createClass({
     state = state || this.state;
 
     return new Point(
-      -state.position.x,
-      -state.position.y).toScreenRect(
-          state.scale,
-          window.innerWidth,
-          window.innerHeight);
-  },
-
-  getWindowSize: function () {
-    return new Point(
-      global.innerWidth,
-      global.innerHeight);
-  },
-
-  getWindowAspectRatio: function () {
-    return global.innerWidth /
-           global.innerHeight;
+      state.position.x,
+      state.position.y).toRectFromTopLeft(
+          state.width,
+          state.height);
   },
 
   setupViewListener: function () {
@@ -134,6 +120,33 @@ global.EntityMixin = React.createClass({
     return style;
   },
 
+  render: function () {
+    /*jshint white:false, nonbsp:false*/
+    var style = this.computeStyle();
+
+    this.updateTileScroll();
+
+    return (
+      <div className="canvas-entity"
+           style={style}
+           onTouchStart={this.handleTouchStart}
+           onTouchMove={this.handleTouchMove}
+           onTouchCancel={this.handleTouchStop}
+              onTouchEnd={this.handleTouchStop}
+           onMouseDown={this.handleMouseDown}
+           onMouseMove={this.handleMouseMove}
+           onMouseUp={this.handleMouseUp}>
+        <div className="position">
+          {this.state.position.x},&nbsp;
+          {this.state.position.y},&nbsp;
+          {this.state.position.x + this.state.width},&nbsp;
+          {this.state.position.y + this.state.height},&nbsp;
+          {this.state.scale}
+        </div>
+      </div>
+    );
+  },
+
   componentDidMount: function () {
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('touchstart', this.handleTouchStart);
@@ -169,6 +182,7 @@ global.EntityMixin = React.createClass({
       scale: this.state.scale / 2,
       position: this.state.position.divide(2)
     };
+
     this.updateBounds(state);
     this.setState(state);
   },
@@ -277,3 +291,19 @@ global.EntityMixin = React.createClass({
     delete this.lastMousePosition;
   }
 });
+
+var CanvasEntity = module.exports;
+
+CanvasEntity.safeRender = function (props) {
+  /*jshint white:false*/
+  var canvas_entity =
+    <CanvasEntity
+      initial_x={props.initialX}
+      initial_y={props.initialY}
+      initial_scale={props.initialScale}
+      initial_width={props.initialWith}
+      initial_height={props.initialHeight}
+      entity_options={props.entityOptions}/>;
+
+  return React.renderComponent(canvas_entity, props && props.parent);
+};

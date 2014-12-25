@@ -1,22 +1,14 @@
 'use strict';
 
-// var Schema = require('jugglingdb').Schema;
+var // Schema = require('jugglingdb').Schema,
+    ObjectID = require('../db/mongo.js').schema.ObjectID;
 
 module.exports = app.db.mongo.schema.define('Wall', {
-  name: {type: String, length: 255},
-  // user: {type: Schema.ObjectId, index: true},
-  // loc: {
-  //   x: Number,
-  //   y: Number
-  // },
-  // scale: {
-  //   x: Number,
-  //   y: Number
-  // },
+  user: {type: ObjectID, index: true},
+  meta: {type: Object, default: {}},
+  name: {type: String, length: 255, index: true},
   date: {type: Date, default: Date.now},
-  mdate: {type: Date, default: Date.now},
-  layer: Number,
-  hidden: Boolean
+  mdate: {type: Date, default: Date.now}
 }, {
   table: 'walls'
 });

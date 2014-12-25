@@ -3,8 +3,9 @@
 
 require('./lib/Point.js');
 
-var CanvasScroll = require('./canvas_scroll.jsx'),
-    CanvasOverlay = require('./canvas_overlay.jsx');
+var CanvasBuffer = require('./canvas_buffer.jsx'),
+    CanvasOverlay = require('./canvas_overlay.jsx'),
+    CanvasEntity = require('./canvas_entity.jsx');
 
 module.exports =
 global.CanvasView = React.createClass({
@@ -30,6 +31,7 @@ global.CanvasView = React.createClass({
 
     this.updateBounds(state);
     this.setupViewListener();
+    this.getVisibleEntities();
 
     return state;
   },
@@ -51,30 +53,25 @@ global.CanvasView = React.createClass({
     return new Point(
       -state.position.x,
       -state.position.y).toScreenRect(
-          state.scale,
-          window.innerWidth,
-          window.innerHeight);
-  },
-
-  getWindowSize: function () {
-    return new Point(
-      global.innerWidth,
-      global.innerHeight);
-  },
-
-  getWindowAspectRatio: function () {
-    return global.innerWidth /
-           global.innerHeight;
+        state.scale,
+        window.innerWidth,
+        window.innerHeight);
   },
 
   setupViewListener: function () {
-    app.onEntityUpdate(function (entity) {
+    app.onEntityUpdate(viewEntityHandler.bind(this));
+    
+    function viewEntityHandler(entity) {
+      /*jshint validthis:true*/
       if (entity.id !== this.props.view_id) return;
-      this.noEMIT = true;
+
+      this.shouldBroadcastWait = true;
+
       var state = {position: entity.position};
+
       this.updateBounds(state);
       this.setState(state);
-    }.bind(this));
+    }
   },
 
   updateTileScroll: function () {
@@ -106,11 +103,34 @@ global.CanvasView = React.createClass({
   },
 
   broadcastState: function () {
-    if (!this.noEMIT) {
-      app.setEntity(this.props.view_id, this.state, function () {});
-      // session.onceSessionReady(function () {
-      //   view.send(JSON.stringify(this.state));
-      // }.bind(this));
+    if (this.shouldBroadcastWait) return;
+
+    this.saveViewEntity();
+    this.getVisibleEntities();
+  },
+
+  saveViewEntity: function () {
+    if (!this.delaySetEntity) {
+      this.delaySetEntity = true;
+      app.setEntity(this.props.view_id, this.state, function () {
+        delete this.delaySetEntity;
+      }.bind(this));
+    }
+  },
+
+  getVisibleEntities: function () {
+    var query = {};
+    if (!this.delayGetEntities) {
+      this.delayGetEntities = true;
+      app.getEntities(query, function (err, entities) {
+        delete this.delayGetEntities;
+        this.setState({entities: entities});
+        this.shouldBroadcastWait = true;
+        setTimeout(function () {
+          console.log('visible', this.state.entities);
+          delete this.shouldBroadcastWait;
+        }.bind(this), 100);
+      }.bind(this));
     }
   },
 
@@ -137,6 +157,18 @@ global.CanvasView = React.createClass({
 
     this.updateTileScroll();
 
+    var entities = this.state.entities &&
+      this.state.entities.map(function (entity) {
+        return <CanvasEntity
+          key={entity.id}
+          initial_x={entity.position.x}
+          initial_y={entity.position.y}
+          initial_scale={entity.scale}
+          initial_width={100}
+          initial_height={100}
+          entity_options={entity}/>;
+      });
+
     return (
       <div className="canvas-view"
            onTouchStart={this.handleTouchStart}
@@ -153,9 +185,12 @@ global.CanvasView = React.createClass({
         </div>
         <div className="canvas-view-transform"
              style={style}>
-          <CanvasScroll ref="scroll"
+          <CanvasBuffer ref="scroll"
                         view={this}
                         tile_options={this.props.tile_options}/>
+        </div>
+        <div className="canvas-view-entities">
+          {entities}
         </div>
         <CanvasOverlay ref="overlay"/>
         <div className="buttons">
@@ -171,26 +206,25 @@ global.CanvasView = React.createClass({
     );
   },
 
+  componentDidMount: function () {
+    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('touchstart', this.handleTouchStart);
+    window.addEventListener('touchmove', this.handleTouchMove);
+    window.addEventListener('touchmove', this.handleTouchStop);
+    window.addEventListener('mousedown', this.handleMouseDown);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
+  },
 
-    componentDidMount: function () {
-      window.addEventListener('resize', this.handleResize);
-      window.addEventListener('touchstart', this.handleTouchStart);
-      window.addEventListener('touchmove', this.handleTouchMove);
-      window.addEventListener('touchmove', this.handleTouchStop);
-      window.addEventListener('mousedown', this.handleMouseDown);
-      window.addEventListener('mousemove', this.handleMouseMove);
-      window.addEventListener('mouseup', this.handleMouseUp);
-    },
-
-    componentWillUnmount: function () {
-      window.removeEventListener('resize', this.handleResize);
-      window.removeEventListener('touchstart', this.handleTouchStart);
-      window.removeEventListener('touchmove', this.handleTouchMove);
-      window.removeEventListener('touchmove', this.handleTouchStop);
-      window.removeEventListener('mousedown', this.handleMouseDown);
-      window.removeEventListener('mousemove', this.handleMouseMove);
-      window.removeEventListener('mouseup', this.handleMouseUp);
-    },
+  componentWillUnmount: function () {
+    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('touchstart', this.handleTouchStart);
+    window.removeEventListener('touchmove', this.handleTouchMove);
+    window.removeEventListener('touchmove', this.handleTouchStop);
+    window.removeEventListener('mousedown', this.handleMouseDown);
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('mouseup', this.handleMouseUp);
+  },
 
   handleZoomIn: function () {
     var state = {
@@ -207,6 +241,7 @@ global.CanvasView = React.createClass({
       scale: this.state.scale / 2,
       position: this.state.position.divide(2)
     };
+
     this.updateBounds(state);
     this.setState(state);
   },
@@ -224,13 +259,13 @@ global.CanvasView = React.createClass({
 
   handleTouchStart: function (event) {
     var touch;
-    if (!this.firstTouchId) {
-      touch = event.touches[0];
+    if (this.firstTouchId) return;
 
-      this.firstTouchId = touch.identifier;
+    touch = event.touches[0];
 
-      this.handleMouseDown(touch);
-    }
+    this.firstTouchId = touch.identifier;
+
+    this.handleMouseDown(touch);
   },
 
   handleTouchMove: function (event) {
@@ -249,9 +284,7 @@ global.CanvasView = React.createClass({
       touch = null;
     }
 
-    if (!touch) return;
-
-    this.handleMouseMove(touch);
+    if (touch) this.handleMouseMove(touch);
   },
 
   handleTouchStop: function (event) {
@@ -268,15 +301,15 @@ global.CanvasView = React.createClass({
       touch = null;
     }
 
-    if (!touch) {
-      delete this.firstTouchId;
+    if (touch) return;
 
-      this.handleMouseUp();
-    }
+    delete this.firstTouchId;
+
+    this.handleMouseUp();
   },
 
   handleMouseDown: function (event) {
-    delete this.noEMIT;
+    delete this.shouldBroadcastWait;
 
     this.captureLastMousePosition(event);
   },
@@ -295,19 +328,22 @@ global.CanvasView = React.createClass({
       this.captureLastMousePosition(event);
 
       // Render on next animation frame.
-      window.requestAnimationFrame(function () {
-        var state = {
-          position: new Point(
-            this.state.position.x - diffX * scale,
-            this.state.position.y - diffY * scale)
-        };
+      window.requestAnimationFrame(updateViewPosition.bind(this));
+    }
+    
+    function updateViewPosition() {
+      /*jshint validthis:true*/
+      var state = {
+        position: new Point(
+          this.state.position.x - diffX * scale,
+          this.state.position.y - diffY * scale)
+      };
 
-        this.updateBounds(state);
-        this.setState(state);
+      this.updateBounds(state);
+      this.setState(state);
 
-        // Allow another move to queue.
-        delete this.mouseMoveFrameWaiting;
-      }.bind(this));
+      // Allow another move to queue.
+      delete this.mouseMoveFrameWaiting;
     }
   },
 
