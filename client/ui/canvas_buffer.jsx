@@ -112,7 +112,7 @@ global.CanvasBuffer = React.createClass({
 
     /*jshint white:false*/
     return (
-      <div className="canvas-scroll">
+      <div className="canvas-buffer">
         {tiles}
       </div>
     );

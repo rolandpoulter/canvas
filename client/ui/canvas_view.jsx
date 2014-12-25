@@ -60,7 +60,7 @@ global.CanvasView = React.createClass({
 
   setupViewListener: function () {
     app.onEntityUpdate(viewEntityHandler.bind(this));
-    
+
     function viewEntityHandler(entity) {
       /*jshint validthis:true*/
       if (entity.id !== this.props.view_id) return;
@@ -112,24 +112,52 @@ global.CanvasView = React.createClass({
   saveViewEntity: function () {
     if (!this.delaySetEntity) {
       this.delaySetEntity = true;
-      app.setEntity(this.props.view_id, this.state, function () {
+
+      var entity = {
+        // user: null,
+        // wall: null,
+        // meta: {},
+        // name: 'undefined',
+        // type: 'undefined',
+        mdate: Date.now(),
+        shape: this.worldBounds.toGeoJSON(),
+        layer: 0,
+        scale: 1,
+        hidden: false,
+        position: this.state.position
+      };
+
+      app.setEntity(this.props.view_id, entity, function () {
         delete this.delaySetEntity;
       }.bind(this));
     }
   },
 
   getVisibleEntities: function () {
-    var query = {};
+    var query = {
+      shape: {
+        $geoIntersects: this.worldBounds.toGeoJSON()
+      }
+    };
+
     if (!this.delayGetEntities) {
       this.delayGetEntities = true;
+
       app.getEntities(query, function (err, entities) {
         delete this.delayGetEntities;
+
+        entities = entities.filter(function (entity) {
+          return this.props.view_id !== entity.id;
+        }.bind(this));
+
         this.setState({entities: entities});
         this.shouldBroadcastWait = true;
+
         setTimeout(function () {
           console.log('visible', this.state.entities);
+
           delete this.shouldBroadcastWait;
-        }.bind(this), 100);
+        }.bind(this), 20);
       }.bind(this));
     }
   },
@@ -159,14 +187,8 @@ global.CanvasView = React.createClass({
 
     var entities = this.state.entities &&
       this.state.entities.map(function (entity) {
-        return <CanvasEntity
-          key={entity.id}
-          initial_x={entity.position.x}
-          initial_y={entity.position.y}
-          initial_scale={entity.scale}
-          initial_width={100}
-          initial_height={100}
-          entity_options={entity}/>;
+        return <CanvasEntity key={entity.id}
+                             entity_data={entity}/>;
       });
 
     return (
@@ -188,9 +210,9 @@ global.CanvasView = React.createClass({
           <CanvasBuffer ref="scroll"
                         view={this}
                         tile_options={this.props.tile_options}/>
-        </div>
-        <div className="canvas-view-entities">
-          {entities}
+          <div className="canvas-view-entities">
+            {entities}
+          </div>
         </div>
         <CanvasOverlay ref="overlay"/>
         <div className="buttons">
@@ -330,7 +352,7 @@ global.CanvasView = React.createClass({
       // Render on next animation frame.
       window.requestAnimationFrame(updateViewPosition.bind(this));
     }
-    
+
     function updateViewPosition() {
       /*jshint validthis:true*/
       var state = {

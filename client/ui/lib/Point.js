@@ -11,6 +11,10 @@ function Point(x, y) {
 
 // http://stackoverflow.com/questions/14880601/translating-between-cartesian-and-screen-coordinates
 
+Point.prototype.toGeoJSON = function () {
+  return {type: 'Point', coordinates: [this.x, this.y]};
+};
+
 Point.prototype.toScreenSpace = function (viewScale) {
   viewScale = viewScale || 1;
 

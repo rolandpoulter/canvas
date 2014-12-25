@@ -21,6 +21,13 @@ Rect.prototype.setRef = function (object) {
   this.ref = object;
 };
 
+Rect.prototype.toGeoJSON = function () {
+  return {
+    type: 'Polygon',
+    coordinates: [[this.left, this.top], [this.right, this.bottom]]
+  };
+};
+
 Rect.prototype.toScreenSpace = function (viewX, viewY, viewScale) {
   var a = new global.Point(this.left, this.top),
       b = new global.Point(this.right, this.bottom);
