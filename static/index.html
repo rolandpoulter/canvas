@@ -4,18 +4,31 @@
   <meta charset="utf-8">
   <title>Wall.IO</title>
   <meta name="description" content="Wall.IO">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/client.css">
   <script>
     window.onerror = function () {
       setTimeout(window.location.reload.bind(window.location), 5000);
     };
   </script>
+  <!--[if lt IE 9]>
+    <script>
+      (function(){
+        var ef = function(){};
+        window.console = window.console || {log:ef,warn:ef,error:ef,dir:ef};
+      }());
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv-printshiv.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-shim.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-sham.js"></script>
+  <![endif]-->
   <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 </head>
 <body>
   <script src="/js/client.js"></script>
-  <img id="wall_io_logo"
-       src="/img/wall.io.svg"></img>
+  <img id="wall_io_logo" src="/img/wall.io.svg"></img>
   <div id="wall_io_canvas"></div>
 </body>
 </html>

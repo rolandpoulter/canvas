@@ -89,7 +89,7 @@ global.CanvasEntity = React.createClass({
     style.width = state.width + 'px';
     style.height = state.height + 'px';
     style.transform =
-    style['-webkit-transform'] =
+    style.WebkitTransform =
       'scale(' + state.scale + ')' +
       'translate(' +
         state.position.x + 'px,' +
@@ -116,19 +116,3 @@ global.CanvasEntity = React.createClass({
     );
   }
 });
-
-var CanvasEntity = module.exports;
-
-CanvasEntity.safeRender = function (props) {
-  /*jshint white:false*/
-  var canvas_entity =
-    <CanvasEntity
-      initial_x={props.initialX}
-      initial_y={props.initialY}
-      initial_scale={props.initialScale}
-      initial_width={props.initialWith}
-      initial_height={props.initialHeight}
-      entity_options={props.entityOptions}/>;
-
-  return React.renderComponent(canvas_entity, props && props.parent);
-};

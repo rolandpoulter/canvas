@@ -22,6 +22,8 @@ global.jQuery.ajax({
     app.onSession(function (session) {
       if (app.config.debug) console.log(session);
 
+      app.session = session;
+
       app.getEntityById(session.view_id, function (err, view) {
         if (view) session.view = view;
 

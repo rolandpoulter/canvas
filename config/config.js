@@ -6,8 +6,8 @@ var package_json = require('../package.json');
 
 require('../logger.js');
 
-if (global.config)
-  logger.warn(new Error('Config already exists.'));
+// if (global.config)
+//   logger.warn(new Error('Config already exists.'));
 
 global.config = exports;
 

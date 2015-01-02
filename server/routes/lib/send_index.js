@@ -6,10 +6,11 @@ var ObjectID = require('../../db/mongo.js').schema.ObjectID;
 module.exports = sendIndex;
 
 function* sendIndex() {
-  if (config.debug)
-    logger.log('SESSION_ID', this.cookies.get('wall.id', true));
+  // if (config.debug)
+    // logger.log('SESSION_ID', this.cookies.get('wall.id', true));
 
-  var session = yield this.session;
+  // var session = yield this.session;
+  var session = yield this.getSession;
 
   // session.name = 'roland';
 

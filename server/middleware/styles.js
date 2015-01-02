@@ -5,11 +5,19 @@ var path = require('path'),
     mount = require('koa-mount'),
     staticServer = require('koa-static');
 
-var bs_path = path.join(__dirname, '..', '..', 'node_modules', 'bootstrap'),
-    less_src = path.join(__dirname, '..', '..', 'client'),
+var bs_path = path.join(__dirname, '..', '..', 'node_modules',
+      'bootstrap'),
+    bsw_path = path.join(__dirname, '..', '..', 'node_modules',
+      'react-widgets');
+
+var less_src = path.join(__dirname, '..', '..', 'client'),
     less_dest = path.join(__dirname, '..', '..', 'static');
 
-app.base.use(mount('/fonts', staticServer(path.join(bs_path, 'fonts'))));
+app.base.use(mount('/fonts',
+  staticServer(path.join(bs_path, 'fonts'))));
+
+app.base.use(mount('/fonts',
+  staticServer(path.join(bsw_path, 'dist', 'fonts'))));
 
 app.base.use(less(less_src, {
   dest: less_dest,
@@ -18,6 +26,9 @@ app.base.use(less(less_src, {
   once: false,
   pathRoot: '/',
   parser: {
-    paths: [path.join(bs_path, 'less')],
+    paths: [
+      path.join(bs_path, 'less'),
+      path.join(bsw_path, 'lib', 'less')
+    ],
   }
 }));

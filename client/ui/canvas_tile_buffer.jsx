@@ -112,21 +112,9 @@ global.CanvasBuffer = React.createClass({
 
     /*jshint white:false*/
     return (
-      <div className="canvas-buffer">
+      <div className="canvas-tile-buffer">
         {tiles}
       </div>
     );
   }
 });
-
-var CanvasBuffer = module.exports;
-
-CanvasBuffer.safeRender = function (props) {
-  /*jshint white:false*/
-  var canvas_buffer =
-    <CanvasBuffer
-      view={props.view}
-      tile_options={props.tileOptions}/>;
-
-  return React.renderComponent(canvas_buffer, props && props.parent);
-};

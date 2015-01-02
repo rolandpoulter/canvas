@@ -20,6 +20,7 @@ require('./middleware/bundle.js');
 require('./middleware/styles.js');
 require('./middleware/static.js');
 require('./middleware/session.js');
+require('./middleware/passport.js');
 require('./middleware/router.js');
 
 app.io = {};
@@ -31,5 +32,6 @@ require('./io/session.js');
 app.routes = {};
 require('./routes/config.js');
 require('./routes/wall.js');
+require('./routes/user.js');
 
 // if (module.hot) module.hot.accept();

@@ -22,5 +22,6 @@ module.exports = app.db.mongo.schema.define('Entity', {
 
 mongo.schema.on('connected', function () {
   var entities = mongo.schema.client.collection('entities');
+
   entities.ensureIndex({shape: '2dsphere'});
 });

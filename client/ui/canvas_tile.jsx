@@ -42,19 +42,3 @@ global.CanvasTile = React.createClass({
     );
   }
 });
-
-var CanvasTile = module.exports;
-
-CanvasTile.safeRender = function (props) {
-  /*jshint white:false*/
-  var canvas_tile =
-    <CanvasTile
-      hash={props.hash}
-      bounds={props.bounds}
-      scroll={props.scroll}
-      tile_size={props.tileSize}
-      initial_screen_x={props.initialScreenX}
-      initial_screen_y={props.initialScreenY}/>;
-
-  return React.renderComponent(canvas_tile, props && props.parent);
-};

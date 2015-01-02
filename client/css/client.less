@@ -1,4 +1,5 @@
 @import 'bootstrap';
+@import 'react-widgets';
 
 html, body, #wall_io_canvas {
   width: 100%;
@@ -8,10 +9,11 @@ html, body, #wall_io_canvas {
 
 body {
   background: #334;
-  color: #dfd;
 }
 
-.canvas-view, .canvas-scroll, .canvas-tile {
+.canvas-view,
+.canvas-tile-buffer,
+.canvas-tile {
   -webkit-touch-callout: none;
     -webkit-user-select: none;
      -khtml-user-select: none;
@@ -26,10 +28,11 @@ body {
 
 #wall_io_logo {
   position: absolute;
-  left: 10px;
-  top: 10px;
+  right: -50px;
+  bottom: 30px;
   width: 500px;
   height: 100px;
+  opacity: 0.5;
 }
 
 #wall_io_canvas {
@@ -39,6 +42,7 @@ body {
 }
 
 .canvas-view {
+  color: #dfd;
   width: 100%;
   height: 100%;
   position: relative
@@ -47,7 +51,22 @@ body {
 .canvas-view .position {
   position: absolute;
   bottom: 5px;
-  left: 5px;
+  right: 10px;
+}
+
+.canvas-view .frame {}
+
+.canvas-view .buttons {
+  position: absolute;
+  z-index: 100;
+  right: 5px;
+  top: 55px;
+}
+
+.canvas-view-transform {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .canvas-entity {
@@ -55,7 +74,17 @@ body {
   border: 2px dashed red;
 }
 
-.canvas-buffer {
+.canvas-entity .position {
+  top: 5px;
+  left: 5px;
+}
+
+.canvas-entity .buttons {
+  top: 5px;
+  right: 5px;
+}
+
+.canvas-tile-buffer {
   position: relative;
 }
 
@@ -69,11 +98,53 @@ body {
   display: none;
 }
 
-
-
-.buttons {
+.canvas-overlay {
   position: absolute;
-  z-index: 100;
-  right: 0;
-  top: 0;
 }
+
+.canvas-overlay .wrap {
+  position: relative;
+}
+
+.canvas-overlay .wrap > div {
+  position: absolute;
+}
+
+.canvas-overlay .wrap .cornerstone {
+  background: #000;
+}
+
+.canvas-overlay .wrap .menubar {
+  background: #112;
+}
+
+.canvas-overlay .wrap .sidebar {
+  background: #222;
+}
+
+.modal-backdrop {
+  width: 100%;
+  height: 100%;
+}
+
+.auth-dialog .modal-body {
+  padding: 15px 15px 0 15px;
+}
+
+.auth-dialog .modal-body .close {
+  padding: 5px 10px;
+}
+
+.auth-dialog .modal-body .tab-content {
+  padding: 15px 0 0  0;
+}
+
+.auth-dialog .modal-body .tab-content form {
+  padding: 0 15px 10px 15px;
+}
+
+.auth-dialog .oauth-login {
+  margin-left: 0.5em;
+}
+
+#feedly-mini {display: none;}

@@ -3,7 +3,7 @@
 
 require('./lib/Point.js');
 
-var CanvasBuffer = require('./canvas_buffer.jsx'),
+var CanvasTileBuffer = require('./canvas_tile_buffer.jsx'),
     CanvasOverlay = require('./canvas_overlay.jsx'),
     CanvasEntity = require('./canvas_entity.jsx');
 
@@ -154,8 +154,6 @@ global.CanvasView = React.createClass({
         this.shouldBroadcastWait = true;
 
         setTimeout(function () {
-          console.log('visible', this.state.entities);
-
           delete this.shouldBroadcastWait;
         }.bind(this), 20);
       }.bind(this));
@@ -170,7 +168,7 @@ global.CanvasView = React.createClass({
     var style = {};
 
     style.transform =
-    style['-webkit-transform'] =
+    style.WebkitTransform =
       'scale(' + state.scale + ')' +
       'translate(' +
         state.position.x + 'px,' +
@@ -200,30 +198,32 @@ global.CanvasView = React.createClass({
            onMouseDown={this.handleMouseDown}
            onMouseMove={this.handleMouseMove}
            onMouseUp={this.handleMouseUp}>
-        <div className="position">
-          {this.state.position.x},&nbsp;
-          {this.state.position.y},&nbsp;
-          {this.state.scale}
-        </div>
-        <div className="canvas-view-transform"
-             style={style}>
-          <CanvasBuffer ref="scroll"
-                        view={this}
-                        tile_options={this.props.tile_options}/>
-          <div className="canvas-view-entities">
-            {entities}
+        <div className="frame">
+          <div className="position">
+            {this.state.position.x},&nbsp;
+            {this.state.position.y},&nbsp;
+            {this.state.scale}
+          </div>
+          <div className="canvas-view-transform"
+               style={style}>
+            <CanvasTileBuffer ref="scroll"
+                              view={this}
+                              tile_options={this.props.tile_options}/>
+            <div className="canvas-view-entities">
+              {entities}
+            </div>
+          </div>
+          <div className="buttons">
+            <a href="#"
+               className="button zoom-in"
+               onClick={this.handleZoomIn}>Zoom In</a>
+            &nbsp;|&nbsp;
+            <a href="#"
+               className="button zoom-out"
+               onClick={this.handleZoomOut}>Zoom Out</a>
           </div>
         </div>
         <CanvasOverlay ref="overlay"/>
-        <div className="buttons">
-          <a href="#"
-             className="button zoom-in"
-             onClick={this.handleZoomIn}>Zoom In</a>
-          &nbsp;|&nbsp;
-          <a href="#"
-             className="button zoom-out"
-             onClick={this.handleZoomOut}>Zoom Out</a>
-        </div>
       </div>
     );
   },
@@ -385,5 +385,5 @@ CanvasView.safeRender = function (props) {
       initial_scale={props.initialScale}
       tile_options={props.tileOptions}/>;
 
-  return React.renderComponent(canvas_view, props && props.parent);
+  return React.render(canvas_view, props && props.parent);
 };
