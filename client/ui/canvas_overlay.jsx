@@ -14,8 +14,8 @@ global.CanvasOverlay = React.createClass({
 
   getInitialState: function () {
     var cornerstone_size = {
-      x: 50,
-      y: 50
+      x: 60,
+      y: 60
     };
     return {
       overlay_style: {},

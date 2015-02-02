@@ -86,8 +86,10 @@ function mixin(imports) {
 
   assign('server.app.name', 'wall-io-canvas', commander.app_name);
 
-  assign('server.app.less_paths',
-    [path.join(__dirname, '..', 'node_modules', 'bootstrap', 'less')],
+  assign('server.app.less_paths', [
+    path.join(__dirname, '..', 'node_modules', 'bootstrap', 'less'),
+    path.join(__dirname, '..', 'node_modules', 'react-widgets', 'lib', 'less')
+  ],
     commander.less_paths && commander.less_paths.split(','));
 
   assign('server.app.static_max_age', 0, commander.static_max_age);

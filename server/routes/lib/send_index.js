@@ -10,7 +10,7 @@ function* sendIndex() {
     // logger.log('SESSION_ID', this.cookies.get('wall.id', true));
 
   // var session = yield this.session;
-  var session = yield this.getSession;
+  var session = yield this.session;
 
   // session.name = 'roland';
 

@@ -1,14 +1,14 @@
 'use strict';
 /*jshint maxerr:10000*/
-/*global React, bootstrap*/
+/*global React, bootstrap, widgets*/
+
+var Point = require('./lib/Point.js');
 
 var Modal = bootstrap.Modal,
     Button = bootstrap.Button,
     Input = bootstrap.Input,
-    TabPane = bootstrap.TabPane,
-    TabbedArea = bootstrap.TabbedArea,
-    ButtonGroup = bootstrap.ButtonGroup,
-    NumberPicker = window.widgets.NumberPicker;
+    Multiselect = widgets.Multiselect,
+    NumberPicker = widgets.NumberPicker;
 
 module.exports =
 global.AuthDialog = React.createClass({
@@ -23,9 +23,42 @@ global.AuthDialog = React.createClass({
   getInitialState: function () {
     return {
       isModalOpen: false,
-      entity: {},
+      entity: {
+        // meta: {
+        //   url: '//localhost/img/wall.io.svg',
+        //   layer: 0,
+        //   scale: 0
+        // },
+        // name: 'Wall.IO',
+        // type: ['SVG'],
+        // shape: {
+        //   type: 'Polygon',
+        //   coordinates: [[-125, 125], [125, -125]]
+        // },
+        // private: true
+        // position: {x: -125, y: 125}
+      },
       style: {}
     };
+  },
+
+  saveEntity: function () {
+    console.log(this);
+    var position = new Point(-125, 125),
+        shape = position.toRectFromTopLeft(512, 512);
+    var entity = {
+      meta: {url: '//localhost/img/wall.io.svg'},
+      name: 'Wall.IO',
+      type: ['SVG'],
+      shape: shape.toGeoJSON(),
+      layer: 0,
+      scale: 0,
+      private: true,
+      position: position
+    };
+    app.setEntity(null, entity, function (err, entity) {
+      console.log(err, entity);
+    });
   },
 
   toggle: function () {
@@ -33,9 +66,9 @@ global.AuthDialog = React.createClass({
   },
 
   render: function () {
-    /*jshint white:false*/
+    /*jshint white:false, maxstatements:12*/
 
-    var metaPlaceholder = JSON.stringify({url: '//localhost/img/wall.io.svg'});
+    var metaPlaceholder = JSON.stringify({url: '//localhost/img/picture.png'});
 
     this.metaInput = <Input
       ref="meta"
@@ -51,12 +84,48 @@ global.AuthDialog = React.createClass({
       label="Name:"
       placeholder="Pretty picture!"/>;
 
-    this.typeInput = <Input
-      ref="meta"
-      type="text"
+    var typeList = [
+      {label: 'Audio', id: 'audio'}, // <audio> tag
+      {label: 'Calendar', id: 'calendar'}, // show entities using a calendar
+      {label: 'Canvas', id: 'canvas'}, // canvas painting
+      {label: 'Chart', id: 'chart'}, // d3 charts
+      {label: 'Collada', id: 'collada'}, // 3d collada objects
+      {label: 'Document', id: 'document'},
+      {label: 'Event', id: 'event'},
+      {label: 'File', id: 'file'},
+      {label: 'Graph', id: 'graph'}, // graph of entities
+      {label: 'Group', id: 'group'}, // group of entities
+      {label: 'Instance', id: 'instance'},
+      {label: 'Interface', id: 'interface'},
+      {label: 'Link', id: 'link'}, // uri link
+      {label: 'Mail', id: 'mail'},
+      {label: 'Notes', id: 'notes'}, // note cards
+      {label: 'Photo', id: 'photo'}, // <img> tag
+      {label: 'Pin', id: 'pin'}, // point of reference to other entities
+      {label: 'Presentation', id: 'presentation'},
+      {label: 'Project', id: 'project'},
+      {label: 'Script', id: 'script'},
+      {label: 'Shape', id: 'shape'}, // basic svg shapes
+      {label: 'Slieshow', id: 'slideshow'},
+      {label: 'Spreadsheet', id: 'spreadsheet'},
+      {label: 'SVG', id: 'svg'}, // complex svg files
+      {label: 'Template', id: 'template'},
+      {label: 'Text', id: 'text'},
+      {label: 'Timeline', id: 'timeline'}, // show entities in time line
+      {label: 'Video', id: 'video'}, // <video> tag
+      {label: 'Wall', id: 'wall'}, // inception of walls
+      {label: 'Whiteboard', id: 'whiteboard'},
+      {label: 'Yarn', id: 'yarn'}
+    ];
+
+    this.typeInput = <Multiselect
+      ref="type"
+      data={typeList}
       value={this.state.entity.type}
-      label="Type:"
-      placeholder="photo"/>;
+      onChange={this.onTypeChange}
+      textField='label'
+      valueField='id'
+      placeholder="Photo"/>;
 
     var shapePlaceholder = JSON.stringify({
       type: 'Polygon',
@@ -64,7 +133,7 @@ global.AuthDialog = React.createClass({
     });
 
     this.shapeInput = <Input
-      ref="meta"
+      ref="shape"
       type="textarea"
       value={this.state.entity.shape}
       label="Shape:"
@@ -84,11 +153,11 @@ global.AuthDialog = React.createClass({
       min={-100}
       max={100}/>;
 
-    this.hiddenInput = <Input
-      ref="hidden"
+    this.privateInput = <Input
+      ref="private"
       type="checkbox"
-      label="Hidden:"
-      checked={this.state.entity.hidden}/>;
+      label="private:"
+      checked={this.state.entity.private}/>;
 
     return (
       <Button bsStyle="default"
@@ -115,7 +184,10 @@ global.AuthDialog = React.createClass({
           <form>
             {this.metaInput}
             {this.nameInput}
-            {this.typeInput}
+            <div className="form-group">
+              <label className="control-label"><span>Type:</span></label>
+              {this.typeInput}
+            </div>
             {this.shapeInput}
             <div className="form-group">
               <label className="control-label"><span>Layer:</span></label>
@@ -125,11 +197,12 @@ global.AuthDialog = React.createClass({
               <label className="control-label"><span>Scale:</span></label>
               {this.scaleInput}
             </div>
-            {this.hiddenInput}
+            {this.privateInput}
           </form>
         </div>
         <div className="modal-footer">
-          <Button bsStyle="primary">Save Entity</Button>
+          <Button bsStyle="primary"
+                  onClick={this.saveEntity}>Save Entity</Button>
         </div>
       </Modal>
     );

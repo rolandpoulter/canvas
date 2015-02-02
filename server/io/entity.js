@@ -1,5 +1,7 @@
 'use strict';
 
+var Entity = require('../model/Entity');
+
 var entity_channel = app.ws.ch.registerChannel('entity');
 
 module.exports = entity_channel;
@@ -25,8 +27,6 @@ function respond(method, entity_stream, callback_id, entity_json, error) {
 
 	entity_stream.write(msg.join('|'));
 }
-
-var Entity = require('../model/Entity');
 
 function getEntities(entity_stream, callback_id, params) {
 	Entity.all(params, function (err, entities) {

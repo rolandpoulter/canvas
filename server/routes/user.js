@@ -24,7 +24,7 @@ app.router.post('/auth/custom', function* (next) {
 
 var redirects = {
   successRedirect: '/',
-  failureRedirect: '/'
+  failureRedirect: '/#failedLogin'
 };
 
 app.router.post('/login',
@@ -36,14 +36,14 @@ app.router.get('/logout', function* (next) {
   this.redirect('/');
 });
 
-app.router.get('/auth/facebook', passport.authenticate('facebook'));
-app.router.get('/auth/facebook/callback',
-  passport.authenticate('facebook', redirects));
-
-app.router.get('/auth/twitter', passport.authenticate('twitter'));
-app.router.get('/auth/twitter/callback',
-  passport.authenticate('twitter', redirects));
+// app.router.get('/auth/facebook', passport.authenticate('facebook'));
+// app.router.get('/auth/facebook/callback',
+//   passport.authenticate('facebook', redirects));
 
 app.router.get('/auth/google', passport.authenticate('google'));
 app.router.get('/auth/google/callback',
   passport.authenticate('google', redirects));
+
+// app.router.get('/auth/twitter', passport.authenticate('twitter'));
+// app.router.get('/auth/twitter/callback',
+//   passport.authenticate('twitter', redirects));

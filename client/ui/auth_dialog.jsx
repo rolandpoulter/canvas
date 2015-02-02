@@ -1,13 +1,17 @@
 'use strict';
 /*jshint maxerr:10000*/
-/*global React, bootstrap*/
+/*global React, bootstrap, ApiRequest*/
+
+require('./lib/ApiRequest.js');
 
 var Modal = bootstrap.Modal,
     Button = bootstrap.Button,
     Input = bootstrap.Input,
+    Tooltip = bootstrap.Tooltip,
     TabPane = bootstrap.TabPane,
     TabbedArea = bootstrap.TabbedArea,
-    ButtonGroup = bootstrap.ButtonGroup;
+    ButtonGroup = bootstrap.ButtonGroup,
+    OverlayTrigger = bootstrap.OverlayTrigger;
 
 module.exports =
 global.AuthDialog = React.createClass({
@@ -36,6 +40,44 @@ global.AuthDialog = React.createClass({
   onUserEmailChange: function () {},
   onPasswordChange: function () {},
   onConfirmPasswordChange: function () {},
+
+  // onDropboxLogIn: function () {
+  //   new ApiRequest('/', function (err, event, apiRequest) {});
+  // },
+
+  onFacebookLogIn: function () {
+    // new ApiRequest('/', function (err, event, apiRequest) {});
+  },
+
+  onGoogleLogIn: function () {
+    window.location = '//' + window.location.host + '/auth/google';
+  },
+
+  // onInstagramLogIn: function () {
+  //   new ApiRequest('/', function (err, event, apiRequest) {});
+  // },
+
+  onTwitterLogIn: function () {
+    // new ApiRequest('/', function (err, event, apiRequest) {});
+  },
+
+  // onTumblrLogIn: function () {
+  //   new ApiRequest('/', function (err, event, apiRequest) {});
+  // },
+
+  // onVineLogInLogIn: function () {
+  //   new ApiRequest('/', function (err, event, apiRequest) {});
+  // },
+
+  onLogIn: function () {
+    // new ApiRequest('/', function (err, event, apiRequest) {});
+  },
+
+  onSignUp: function () {
+    // new ApiRequest({
+    //   method: 'POST', url: '/',
+    //   callback: function () {}});
+  },
 
   render: function () {
     /*jshint white:false*/
@@ -103,23 +145,55 @@ global.AuthDialog = React.createClass({
         </form>
         <div className="modal-footer">
           <ButtonGroup>
-            <Button>
-              <i className="fa fa-facebook"></i>
-              <span>&nbsp;Facebook</span>
+            <Button onClick={this.onDropboxLogIn}
+                    disabled={true}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Dropbox</Tooltip>}>
+                <i className="fa fa-dropbox"></i>
+              </OverlayTrigger>
             </Button>
-            <Button>
-              <i className="fa fa-google-plus"></i>
-              <span>&nbsp;Google</span>
+            <Button onClick={this.onFacebookLogIn}
+                    disabled={true}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Facebook</Tooltip>}>
+                <i className="fa fa-facebook"></i>
+              </OverlayTrigger>
             </Button>
-            <Button>
-              <i className="fa fa-instagram"></i>
-              <span>&nbsp;Instagram</span>
+            <Button onClick={this.onGoogleLogIn}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Google</Tooltip>}>
+                <i className="fa fa-google-plus"></i>
+              </OverlayTrigger>
             </Button>
-            <Button>
-              <i className="fa fa-tumblr"></i>
-              <span>&nbsp;Tumblr</span>
+            <Button onClick={this.onInstagramLogIn}
+                    disabled={true}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Instagram</Tooltip>}>
+                <i className="fa fa-instagram"></i>
+              </OverlayTrigger>
             </Button>
-            <Button bsStyle="primary">Log In</Button>
+            <Button onClick={this.onTumblrLogIn}
+                    disabled={true}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Tumblr</Tooltip>}>
+                <i className="fa fa-tumblr"></i>
+              </OverlayTrigger>
+            </Button>
+            <Button onClick={this.onTwitterLogIn}
+                    disabled={true}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Twitter</Tooltip>}>
+                <i className="fa fa-twitter"></i>
+              </OverlayTrigger>
+            </Button>
+            <Button disabled={true}>
+              <OverlayTrigger placement="top"
+                              overlay={<Tooltip>Vine</Tooltip>}>
+                <i className="fa fa-vine"></i>
+              </OverlayTrigger>
+            </Button>
+            <Button bsStyle="primary"
+                    onClick={this.onLogIn}>Log In</Button>
           </ButtonGroup>
         </div>
       </TabPane>;
@@ -133,7 +207,8 @@ global.AuthDialog = React.createClass({
           {this.confirmPasswordInput}
         </form>
         <div className="modal-footer">
-          <Button bsStyle="primary">Sign Up</Button>
+          <Button bsStyle="primary"
+                  onClick={this.onSignUp}>Sign Up</Button>
         </div>
       </TabPane>;
 

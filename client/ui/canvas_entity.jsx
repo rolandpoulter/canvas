@@ -24,7 +24,11 @@ global.CanvasEntity = React.createClass({
         Math.abs(coordinates[1][0] - coordinates[0][0]) || 0,
       height: entity.height || coordinates &&
         Math.abs(coordinates[1][1] - coordinates[0][1]) || 0,
-      position: new Point(entity.position.x, entity.position.y)
+      position: entity.position ?
+        new Point(entity.position.x, entity.position.y) :
+        coordinates ?
+          new Point(coordinates[1][0] - coordinates[0][0]) :
+          new Point(0, 0)
     };
 
     this.updateBounds(state);
@@ -100,7 +104,12 @@ global.CanvasEntity = React.createClass({
 
   render: function () {
     /*jshint white:false, nonbsp:false*/
-    var style = this.computeStyle();
+    var style = this.computeStyle(),
+        media = '';
+
+    if (this.props.entity_data.meta.url) {
+      media = <img src={this.props.entity_data.meta.url}/>;
+    }
 
     return (
       <div className="canvas-entity"
@@ -112,6 +121,7 @@ global.CanvasEntity = React.createClass({
           {this.state.position.y + this.state.height},&nbsp;
           {this.state.scale}
         </div>
+        {media}
       </div>
     );
   }

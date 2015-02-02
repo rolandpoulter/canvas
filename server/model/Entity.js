@@ -6,16 +6,24 @@ var mongo = require('../db/mongo.js'),
 module.exports = app.db.mongo.schema.define('Entity', {
   user: {type: ObjectID, index: true},
   wall: {type: ObjectID, index: true},
-  meta: {type: Object, default: {}},
+  view: {type: ObjectID, index: true},
+  meta: {type: Object, default: {
+    label: '',
+    layer: 0,
+    log: [],
+    position: {x: 0, y: 0},
+    refs: {},
+    scale: 1,
+    size: {x: 0, y: 0},
+    text: '',
+    url: ''
+  }},
   name: {type: String, length: 255, index: true},
-  type: {type: String, length:  32, index: true},
+  type: {type: String, length: 255, index: true},
   date:  {type: Date, default: Date.now, index: true},
   mdate: {type: Date, default: Date.now, index: true},
   shape: {type: Object, default: {}},
-  layer: {type: Number, default: 0, index: true},
-  scale: {type: Number, default: 1, index: true},
-  hidden: {type: Boolean, default: false, index: true},
-  position: {type: Object, default: {}}
+  private: {type: Boolean, default: false, index: true}
 }, {
   table: 'entities'
 });
